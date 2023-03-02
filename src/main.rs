@@ -1,6 +1,7 @@
 use chrono;
 use chrono_tz;
 use std::io::{Write};
+use curl::easy::Easy;
 
 /// Returns the current date and time as a string formatted as `YYYY-MM-DD HH:MM:SS TZ`.
 ///
@@ -64,11 +65,36 @@ fn handle_date() -> Option<String> {
     }
 }
 
-fn main() {
-    let current_date = match handle_date() {
-        Some(date) => date,
-        None => return, // return early from main if handle_date returns None
-    };
+fn handle_generic_query(question: String, hint: String) -> Option<String> {
+    println!("{} [{}]: ", question, hint);
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input).ok()?;
+    input.pop();
 
-    println!("Ends{}", current_date);
+    return Some(input);
+}
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let current_date = handle_date().ok_or("Error: Somthing happened while trying to pro date.") ?;
+
+    println!(">>> Date: {}", current_date);
+
+    let location: String = handle_generic_query("What's your current location".to_string(), 
+                                                      "<address>, <city>".to_string()).ok_or("Error: Something happened while trying to process location. ") ?;
+
+    println!(">>> Location: {}", location);
+
+    let mut easy = Easy::new();
+    easy.url("https://www.rust-lang.org/")?;
+
+    easy.write_function(|data| {
+        std::io::stdout().write_all(data).unwrap();
+        Ok(data.len())
+    })?;
+
+    easy.perform()?;
+
+    println!(">>> Program ended successfully.");
+
+    Ok(())
 }
