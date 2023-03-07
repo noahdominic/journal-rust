@@ -1,7 +1,23 @@
 use chrono;
 use chrono_tz;
-use std::io::{Write};
-use curl::easy::Easy;
+use std::io::Write;
+use curl::easy;
+use serde::Deserialize;
+use serde_json;
+
+#[derive(Debug, Deserialize)]
+struct Location {
+    name: String,
+    latitude: f64,
+    longitude: f64,
+    timezone: String,
+    country: String
+}
+
+#[derive(Debug, Deserialize)]
+struct GeoResult {
+    results: Vec<Location>
+}
 
 /// Returns the current date and time as a string formatted as `YYYY-MM-DD HH:MM:SS TZ`.
 ///
@@ -44,7 +60,9 @@ fn verify_date() -> Option<bool> {
 }
 
 fn prompt_for_timezone() -> Option<String> {
-    println!("What's the correct timezone? [Enter an IANA Timezone]: ");
+    print!("What's the correct timezone? [Enter an IANA Timezone]: ");
+    std::io::stdout().flush().expect("Error: Flush failed!");
+
     let mut input = String::new();
     std::io::stdin().read_line(&mut input).ok()?;
     input.pop();
@@ -52,11 +70,11 @@ fn prompt_for_timezone() -> Option<String> {
     return Some(input);
 }
 
-fn handle_date() -> Option<String> {
-    let mut tz_as_str: String = "Asia/Manila".to_string();
+fn handle_date(timezone: String) -> Option<String> {
+    let mut tz_as_str: String = timezone.to_string();
     loop {
         let current_date = get_current_date(tz_as_str) ?;
-        println!("Today is currently {:?}.", current_date);
+        println!("According to your location, it is currently {:?}.", current_date);
         match verify_date() {
             Some(true) => { return Some(current_date) },
             Some(false) => { tz_as_str = prompt_for_timezone() ?},
@@ -66,35 +84,72 @@ fn handle_date() -> Option<String> {
 }
 
 fn handle_generic_query(question: String, hint: String) -> Option<String> {
-    println!("{} [{}]: ", question, hint);
     let mut input = String::new();
+    
+    print!("{} [{}]: ", question, hint);
+    std::io::stdout().flush().expect("Error: Flush failed!");
+
     std::io::stdin().read_line(&mut input).ok()?;
     input.pop();
 
     return Some(input);
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let current_date = handle_date().ok_or("Error: Somthing happened while trying to pro date.") ?;
-
-    println!(">>> Date: {}", current_date);
-
+fn handle_location() -> Result<(String, String, f64, f64, String, String), Box<dyn std::error::Error>>  {
     let location: String = handle_generic_query("What's your current location".to_string(), 
-                                                      "<address>, <city>".to_string()).ok_or("Error: Something happened while trying to process location. ") ?;
+                                                "<optional, addresses, here>, <city>".to_string())
+                           .ok_or("Error: Something happened while trying to process location. ") ?;
 
     println!(">>> Location: {}", location);
 
-    let mut easy = Easy::new();
-    easy.url("https://www.rust-lang.org/")?;
+    // Getting city info via API below...
+    let city = location.split(",")
+                               .last()
+                               .unwrap()
+                               .trim()
+                               .replace(" ", "%20");   
+    let url = format!("https://geocoding-api.open-meteo.com/v1/search?name={city}");
 
-    easy.write_function(|data| {
-        std::io::stdout().write_all(data).unwrap();
-        Ok(data.len())
-    })?;
+    let mut caller = easy::Easy::new();
+    caller.url(url.as_str()) ?;
+    let mut data = Vec::new();
+    {
+        let mut transfer = caller.transfer();
+        transfer.write_function(|new_data| {
+            data.extend_from_slice(new_data);
+            Ok(new_data.len())
+        })?;
+        transfer.perform()?;
+    }
+    let response: GeoResult = serde_json::from_slice(&data) ?;
 
-    easy.perform()?;
+    if response.results.is_empty() {
+        return Err("No results found".into());
+    }
 
-    println!(">>> Program ended successfully.");
+    let city_info = response.results;
+
+    println!(">>> You're currently in {}, {} ({}, {}) in {}", 
+             city_info[0].name, 
+             city_info[0].country,
+             city_info[0].latitude,
+             city_info[0].longitude,
+             city_info[0].timezone);
+    Ok((location,
+        city_info[0].name.clone(), 
+        city_info[0].latitude,
+        city_info[0].longitude,
+        city_info[0].country.clone(),
+        city_info[0].timezone.clone()))
+}
+
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let (location, name, latitude, longitude, country, timezone) = handle_location() ?;
+    let current_date = handle_date(timezone).ok_or("Error: Somthing happened while trying to pro date.") ?;
+
+    println!(">>> Date: {}", current_date);
+
 
     Ok(())
 }
