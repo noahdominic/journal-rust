@@ -56,7 +56,7 @@ fn get_direction(degrees: f64) -> String {
 }
 
 
-/// Takes a IANA timezone and returns the current date and time as a string formatted as `YYYY-MM-DD HH:MM:SS TZ`.
+/// Takes an IANA timezone and returns the current date and time as a string formatted as `YYYY-MM-DD HH:MM:SS TZ`.
 ///
 /// # Arguments
 ///
@@ -335,20 +335,20 @@ fn journal_init_driver() -> Result<(String, String), Box<dyn std::error::Error>>
     let (temperature, apparent_temperature, weather_code, rain, windspeed, winddirection, pressure, humidity, visibility, uv_index, sunrise, sunset) = determine_weather(current_date.format("%Y-%m-%d %H:%M").to_string().as_str(), latitude.to_string().as_str(), longitude.to_string().as_str(), timezone.as_str()) ?;
 
     let output_str = format!("DATE: {}\n\
-                                     LOCATION: {location}\n\
-                                     \n\
-                                     Temperature: {temperature} C, feels like {apparent_temperature} C, {}.\n\
-                                     UV Index: {uv_index}  Sunrise: {sunrise}   Sunset: {sunset}\n\
-                                     Rain: {rain}mm\n\
-                                     Winds: {windspeed}km/h {} ({winddirection})\n\
-                                     Pressure: {pressure}hPa\n\
-                                     Humidity: {humidity}%\n\
-                                     Visibility: {}km\
-                                     ", 
-                                     current_date.format("%a, %Y %b %d %H:%M:%S %Z (%:z)"),
-                                     weather_map.get(&weather_code).unwrap_or(&"Unknown conditions"),
-                                     get_direction(winddirection),
-                                     visibility/1000.0);
+                            LOCATION: {location}\n\
+                            \n\
+                            Temperature: {temperature} C, feels like {apparent_temperature} C, {}.\n\
+                            UV Index: {uv_index}  Sunrise: {sunrise}   Sunset: {sunset}\n\
+                            Rain: {rain}mm\n\
+                            Winds: {windspeed}km/h {}\n\
+                            Pressure: {pressure}hPa\n\
+                            Humidity: {humidity}%\n\
+                            Visibility: {}km\
+                            ", 
+                            current_date.format("%a, %Y %b %d %H:%M:%S %Z (%:z)"),
+                            weather_map.get(&weather_code).unwrap_or(&"Unknown conditions"),
+                            get_direction(winddirection),
+                            visibility/1000.0);
 
     let file_name = format!("~/journal/{}", current_date.format("%Y/%m/%d"));
 
@@ -357,35 +357,33 @@ fn journal_init_driver() -> Result<(String, String), Box<dyn std::error::Error>>
     Ok((output_str, file_name))
 }
 
-fn main() {
-    if let Ok((preamble, file_name)) = journal_init_driver() {
+fn main() -> Result <(), Box<dyn std::error::Error>>{
+    let (preamble, file_name) = journal_init_driver() ?;
 
-        let file_path = Path::new(&file_name);
-        
-        // Expand the tilde to the home directory
-        let file_path = if let Some(home_dir) = home_dir() {
-            PathBuf::from(home_dir).join(file_path.strip_prefix("~").unwrap())
-        } else {
-            file_path.to_owned()
-        };
+    let file_path = Path::new(&file_name);
 
-        println!("This will print in: {}\n{}", file_path.display(), preamble);
-
-        // Create directories recursively if needed
-        if let Some(parent) = file_path.parent() {
-            std::fs::create_dir_all(parent).unwrap();
-        }
-
-        // Open the file in append mode if it already exists, otherwise create it
-        let file = OpenOptions::new()
-            .append(true)
-            .create(true)
-            .open(&file_path)
-            .unwrap();
-
-        // Write the string to the file
-        writeln!(&file, "{}", preamble).unwrap();
+    // Expand the tilde to the home directory
+    let file_path = if let Some(home_dir) = home_dir() {
+        PathBuf::from(home_dir).join(file_path.strip_prefix("~").unwrap())
     } else {
-        println!("Program failed.");
+        file_path.to_owned()
+    };
+
+    println!("\n\nThis will print in: {}\n{}", file_path.display(), preamble);
+
+    // Create directories recursively if needed
+    if let Some(parent) = file_path.parent() {
+        std::fs::create_dir_all(parent).unwrap();
     }
+
+    // Open the file in append mode if it already exists, otherwise create it
+    let file = OpenOptions::new()
+        .append(true)
+        .create(true)
+        .open(&file_path)
+        .unwrap();
+
+    // Write the string to the file
+    writeln!(&file, "{}", preamble).unwrap();
+    Ok(())
 }
