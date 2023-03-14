@@ -78,15 +78,15 @@ fn query_for_bool(question: &str, hint: &str) -> Result<bool, std::io::Error> {
 /// - or an `Box<dyn std::error::Error>` if something went wrong while determining the date and time.
 /// 
 fn choose_desired_datetime(timezone: &str) -> Result<chrono::DateTime<chrono_tz::Tz>, Box<dyn std::error::Error>> {
-    let mut tz_as_string: String = timezone.to_string();
+    let mut timezone = String::from(timezone);
     loop {
-        let current_date = super::calculators::get_current_date_from_tz(tz_as_string) ?;
+        let current_date = super::calculators::get_current_date_from_tz(&timezone) ?;
         println!("According to your given timezone, it is currently {:?}.", 
             current_date.format("%Y %b %d %H:%M:%S %Z (%:z)").to_string());
 
         match query_for_bool("Is this the timezone you want to use?", "y/N") ? {
             true => { return Ok(current_date) },
-            false => { tz_as_string = query_for_string("What should the timezone be?", "Enter an IANA Timezone ") ?}
+            false => { timezone = query_for_string("What should the timezone be?", "Enter an IANA Timezone ") ?}
         };
     }
 }
@@ -292,11 +292,11 @@ pub(crate) fn journal_init_driver() -> Result<(String, String), Box<dyn std::err
     ]);
 
     let (location, latitude, longitude, timezone) = determine_location_info() ?;
-    let current_date = choose_desired_datetime(timezone.as_str())?;
-    let current_weather = determine_weather(current_date.format("%Y-%m-%d %H:%M").to_string().as_str(), 
+    let current_date = choose_desired_datetime(&timezone)?;
+    let current_weather = determine_weather(&(current_date.format("%Y-%m-%d %H:%M").to_string()), 
                                                     latitude.to_string().as_str(), 
                                                     longitude.to_string().as_str(), 
-                                                    timezone.as_str()) ?;
+                                                    &timezone) ?;
 
     let output_str = format!("DATE: {}\n\
                             LOCATION: {}\n\
@@ -326,7 +326,7 @@ pub(crate) fn journal_init_driver() -> Result<(String, String), Box<dyn std::err
 
     let file_name = format!("~/journal/{}", current_date.format("%Y/%m/%d"));
 
-    //println!("\n\n{}", output_str);
+    println!("\n\n{}", output_str);
 
     Ok((output_str, file_name))
 }
