@@ -23,7 +23,7 @@ macro_rules! lnprint {
 ///
 /// An `Result<String, std::io::Error>` containing the user's input,
 /// or `std::io::Error` if an error occurred while reading the input.
-///
+/// 
 fn query_for_string(question: &str, hint: &str) -> Result<String, std::io::Error> {
     // Prompt the user with the question and hint.
     lnprint!("{} [{}]: ", question, hint);
@@ -57,13 +57,14 @@ fn query_for_string(question: &str, hint: &str) -> Result<String, std::io::Error
 fn query_for_bool(question: &str, hint: &str) -> Result<bool, std::io::Error> {
     // This is very condensed so here's a more readable summary:
     // - `query_for_string()` is called and passes `question` and `hint`.
-    // - The returned string is then checked it it's "yes" or "y".
-    // - This is wrapped in an `Ok()` and returned
+    // - The returned string is then checked if it's "yes" or "y".
+    // - This yes-ness is wrapped in an `Ok()` and returned
     let answer = query_for_string(question, hint)?.trim().to_lowercase();
     Ok(answer == "yes" || answer == "y")
 }
 
-/// Determines the current date and time for a given timezone
+/// Determines the current date and time that a user wants.  By default, it
+/// chooses the time at the timezone in the argument
 /// 
 /// # Arguments
 /// 
@@ -71,15 +72,15 @@ fn query_for_bool(question: &str, hint: &str) -> Result<bool, std::io::Error> {
 /// 
 /// # Returns
 /// 
-/// This function returns a `Result` that contains either 
+/// A `Result` that contains either 
 /// - a `chrono::DateTime<chrono_tz::Tz>` value representing 
 ///     the current date and time in the given timezone 
 /// - or an `Box<dyn std::error::Error>` if something went wrong while determining the date and time.
 /// 
-fn determine_date(timezone: &str) -> Result<chrono::DateTime<chrono_tz::Tz>, Box<dyn std::error::Error>> {
+fn choose_desired_datetime(timezone: &str) -> Result<chrono::DateTime<chrono_tz::Tz>, Box<dyn std::error::Error>> {
     let mut tz_as_string: String = timezone.to_string();
     loop {
-        let current_date = super::calculators::get_current_date(tz_as_string) ?;
+        let current_date = super::calculators::get_current_date_from_tz(tz_as_string) ?;
         println!("According to your given timezone, it is currently {:?}.", 
             current_date.format("%Y %b %d %H:%M:%S %Z (%:z)").to_string());
 
@@ -105,7 +106,6 @@ fn determine_date(timezone: &str) -> Result<chrono::DateTime<chrono_tz::Tz>, Box
 ///
 /// Returns an error in the form of a string slice if an error occurs while
 /// processing the user's input location or if the geocoding API does not return any results.
-
 fn determine_location_info() -> Result<(String, f64, f64, String), Box<dyn std::error::Error>>  {
     // Uses determine_generic_query to ask user for location
     let full_location: String = query_for_string("What's your current location", 
@@ -139,10 +139,10 @@ fn determine_location_info() -> Result<(String, f64, f64, String), Box<dyn std::
     // Translate what we got from the server to native Rust structs
     let api_response_native: super::GeoResult = serde_json::from_slice(&api_response_bytes)?;
 
-    // NOTE     Choosing the 0th item is completely arbitrary.
+    // TODO     Choosing the 0th item is completely arbitrary.
     //          We should find a way to let the use pick. 
     //          There are multiple cities with the same name.
-
+    
     let city_info = &api_response_native.results[0];
 
     println!("\nYou are currently in {}, {} ({}, {}) in {}.", 
@@ -292,7 +292,7 @@ pub(crate) fn journal_init_driver() -> Result<(String, String), Box<dyn std::err
     ]);
 
     let (location, latitude, longitude, timezone) = determine_location_info() ?;
-    let current_date = determine_date(timezone.as_str())?;
+    let current_date = choose_desired_datetime(timezone.as_str())?;
     let current_weather = determine_weather(current_date.format("%Y-%m-%d %H:%M").to_string().as_str(), 
                                                     latitude.to_string().as_str(), 
                                                     longitude.to_string().as_str(), 

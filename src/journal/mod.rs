@@ -83,16 +83,15 @@ pub fn main_driver() -> Result<(), Box<dyn std::error::Error>> {
     
     // Create directories recursively if needed
     std::fs::create_dir_all(file_path.parent().unwrap()) ?;
-
+    
+    println!("\n\nThis will print in: {}\n{}", file_path.display(), preamble);
+    
     // This is the file of the journal entry
-    let mut file = std::fs::OpenOptions::new()
+    let mut _file = std::fs::OpenOptions::new()
                             .append(true)
                             .create(true)
-                            .open(&file_path)?;
-    writeln!(&mut file, "{}", preamble)?;
-
-    println!("\n\nThis will print in: {}\n{}", file_path.display(), preamble);
-
+                            .open(&file_path)?;    
+    //    writeln!(&mut file, "{}", preamble)?;
     Ok(())
 }
 
