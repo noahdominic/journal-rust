@@ -42,7 +42,7 @@ pub(crate) fn get_direction(degrees: f64) -> String {
 /// let current_date: DateTime<Tz> = get_current_date(tz_str).unwrap();
 /// println!("{}", current_date);
 /// ```
-pub(crate) fn get_current_date_from_tz(tz_as_string: String) -> Result<chrono::DateTime<chrono_tz::Tz>, chrono_tz::ParseError> {
-    let timezone: chrono_tz::Tz = tz_as_string.parse() ?;    
+pub(crate) fn get_current_date_from_tz(tz_as_str: &str) -> Result<chrono::DateTime<chrono_tz::Tz>, chrono_tz::ParseError> {
+    let timezone: chrono_tz::Tz = tz_as_str.parse() ?;    
     return Ok(chrono::Utc::now().with_timezone(&timezone));
 }
