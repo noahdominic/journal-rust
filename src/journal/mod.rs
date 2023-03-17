@@ -91,7 +91,8 @@ pub fn main_driver() -> Result<(), Box<dyn std::error::Error>> {
                             .append(true)
                             .create(true)
                             .open(&file_path)?;    
-    //    writeln!(&mut file, "{}", preamble)?;
+    
+    writeln!(&mut file, "{}", preamble)?;
     Ok(())
 }
 
