@@ -46,3 +46,4 @@ pub(crate) fn get_current_date_from_tz(tz_as_str: &str) -> Result<chrono::DateTi
     let timezone: chrono_tz::Tz = tz_as_str.parse() ?;    
     return Ok(chrono::Utc::now().with_timezone(&timezone));
 }
+

@@ -1,12 +1,11 @@
 use serde::Deserialize;
 use std;
-use std::io::Write;
-use dirs;
 use isocountry;
 
-mod query;
-mod drivers;
 mod calculators;
+mod drivers;
+mod file;
+mod query;
 
 #[derive(Debug, Deserialize)]
 struct Location {
@@ -63,8 +62,6 @@ struct DailyWeather {
     uv_index_max: Vec<f64>
 }
 
-
-
 #[derive(Debug, Deserialize)]
 struct HourlyWeather {
     temperature_2m: Vec<f64>,
@@ -92,31 +89,10 @@ struct WeatherResult {
 /// an empty tuple, representing a successful run or 
 /// a `Box<dyn std::error::Error` which is the error that is passed on from the subfunctions
 ///     if there are any errors inc
-pub fn main_driver() -> Result<(), Box<dyn std::error::Error>> {
+pub fn journal_main_driver() -> Result<(), Box<dyn std::error::Error>> {
     let (preamble, file_name) = drivers::journal_init_driver()?;
-
-    // Expand the tilde to the home directory
-    let file_path = std::path::Path::new(&file_name);
-    let file_path = dirs::home_dir().map_or_else(
-        || file_path.to_owned(),
-        |home_dir| home_dir.join(file_path.strip_prefix("~").unwrap()),
-    );
-    
-    // Create directories recursively if needed
-    std::fs::create_dir_all(file_path.parent().unwrap()) ?;
-    
-    println!("\n\nThis will written in: {}\n{}", file_path.display(), preamble);
-
-    if query::query_for_bool("Does everything look correct?  This will print in the file if yes.")? {
-        // This is the file of the journal entry
-        let mut file = std::fs::OpenOptions::new()
-                                .append(true)
-                                .create(true)
-                                .open(&file_path)?;    
-        
-        writeln!(&mut file, "{}", preamble)?;
-    } else {
-        println!("OK.  File not written.")
-    }
+    let file_path = file::expand_file_path(&file_name)?;
+    file::create_file(&file_path)?;
+    file::write_preamble(&file_path, &preamble)?;
     Ok(())
 }
