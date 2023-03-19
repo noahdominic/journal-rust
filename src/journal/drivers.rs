@@ -1,31 +1,72 @@
 use std::collections::HashMap;
 
-/// Determines the current date and time that a user wants.  By default, it
-/// chooses the time at the timezone in the argument
-/// 
-/// # Arguments
-/// 
-/// * `timezone`: A `String` object representing a IANA timezone to be used to determine the current time
-/// 
-/// # Returns
-/// 
-/// A `Result` that contains either 
-/// - a `chrono::DateTime<chrono_tz::Tz>` value representing 
-///     the current date and time in the given timezone 
-/// - or an `Box<dyn std::error::Error>` if something went wrong while determining the date and time.
-/// 
-fn let_user_choose_desired_datetime(timezone: &str) -> Result<chrono::DateTime<chrono_tz::Tz>, Box<dyn std::error::Error>> {
-    let mut timezone = String::from(timezone);
-    loop {
-        let current_date = super::calculators::get_current_date_from_tz(&timezone) ?;
-        println!("According to your given timezone, it is currently {:?}.", 
-            current_date.format("%Y %b %d %H:%M:%S %Z (%:z)").to_string());
+pub(crate) fn journal_init_driver() -> Result<(String, String), Box<dyn std::error::Error>> {
+    // Create a HashMap that maps integers to status strings
+    let weather_map = HashMap::from([
+        (0, "Clear skies"),
+        (1, "Mainly clear skies"),
+        (2, "Partly cloudy skies"),
+        (3, "Overcast skies"),
+        (45, "Fog"),
+        (48, "Fog"),
+        (51, "Light drizzle"),
+        (53, "Moderate drizzle"),
+        (55, "Heavy drizzle"),
+        (56, "Light drizzle, freezing"),
+        (57, "Moderate or heavy drizzle, freezing"),
+        (61, "Light rain"),
+        (63, "Moderate rain"),
+        (65, "Heavy rain"),
+        (66, "Light rain, freezing"),
+        (67, "Moderate or heavy rain, freezing"),
+        (71, "Snow fall: Slight intensity"),
+        (73, "Snow fall: Moderate intensity"),
+        (75, "Snow fall: Heavy intensity"),
+        (77, "Snow grains"),
+        (80, "Light rain showers"),
+        (81, "Moderate rain showers"),
+        (82, "Violent rainshowers"),
+        (85, "Snow showers: Slight intensity"),
+        (86, "Snow showers: Heavy intensity"),
+        (95, "Thunderstorm: Slight or moderate"),
+        (96, "Thunderstorm with slight hail"),
+        (99, "Thunderstorm with heavy hail"),
+    ]);
+    let (location, latitude, longitude, timezone) = get_location_info()?;
+    let current_date = let_user_choose_desired_datetime(&timezone)?;
+    let current_weather = determine_weather_from_coordinates(&(current_date.format("%Y-%m-%d %H:%M").to_string()), 
+                                                                    latitude.to_string().as_str(), 
+                                                                    longitude.to_string().as_str(), 
+                                                                    &timezone)?;
+    let output_str = format!("DATE: {}\n\
+                            LOCATION: {}\n\
+                            \n\
+                            Temperature: {} C, feels like {} C, {}.\n\
+                            UV Index: {}  Sunrise: {}   Sunset: {}\n\
+                            Rain: {}mm\n\
+                            Winds: {}km/h {}\n\
+                            Pressure: {}hPa\n\
+                            Humidity: {}%\n\
+                            Visibility: {}km\
+                            ", 
+                            current_date.format("%a, %Y %b %d %H:%M:%S %Z (%:z)"),
+                            location,
+                            current_weather.temperature,
+                            current_weather.apparent_temperature,
+                            weather_map.get(&current_weather.weather_code).unwrap_or(&"Unknown conditions"),
+                            current_weather.uv_index,
+                            current_weather.sunrise,
+                            current_weather.sunset,
+                            current_weather.rain,
+                            current_weather.windspeed,
+                            super::calculators::get_direction(current_weather.winddirection),
+                            current_weather.pressure,
+                            current_weather.humidity,
+                            current_weather.visibility/1000.0);
 
-        match super::query::query_for_bool("Is this the timezone you want to use?") ? {
-            true => { return Ok(current_date) },
-            false => { timezone = super::query::query_for_string("What should the timezone be?", "Enter an IANA Timezone ") ?}
-        };
-    }
+    let file_name = format!("~/journal/{}", current_date.format("%Y/%m/%d"));
+
+    Ok((output_str, file_name))
 }
 
 /// Prompts the user to input their current location and queries a geocoding API 
@@ -62,6 +103,32 @@ fn get_location_info() -> Result<(String, f64, f64, String), Box<dyn std::error:
         city_info.timezone.clone()))
 }
 
+/// Determines the current date and time that a user wants.  By default, it
+/// chooses the time at the timezone in the argument
+/// 
+/// # Arguments
+/// 
+/// * `timezone`: A `String` object representing a IANA timezone to be used to determine the current time
+/// 
+/// # Returns
+/// 
+/// A `Result` that contains either 
+/// - a `chrono::DateTime<chrono_tz::Tz>` value representing 
+///     the current date and time in the given timezone 
+/// - or an `Box<dyn std::error::Error>` if something went wrong while determining the date and time.
+fn let_user_choose_desired_datetime(timezone: &str) -> Result<chrono::DateTime<chrono_tz::Tz>, Box<dyn std::error::Error>> {
+    let mut timezone = String::from(timezone);
+    loop {
+        let current_date = super::calculators::get_current_date_from_tz(&timezone) ?;
+        println!("According to your given timezone, it is currently {:?}.", 
+            current_date.format("%Y %b %d %H:%M:%S %Z (%:z)").to_string());
+        match super::query::query_for_bool("Is this the timezone you want to use?") ? {
+            true => { return Ok(current_date) },
+            false => { timezone = super::query::query_for_string("What should the timezone be?", "Enter an IANA Timezone ") ?}
+        };
+    }
+}
+
 /// Retrieves the current weather conditions (at a specific date and time) 
 /// for a given location. 
 /// This makes an API call to the Open Meteo API 
@@ -84,22 +151,9 @@ fn get_location_info() -> Result<(String, f64, f64, String), Box<dyn std::error:
 ///     for which the weather data is to be retrieved. 
 ///     The timezone should be in "Area/Location" format, such as "Europe/London".
 ///     See IANA timezone databases for reference.
-fn determine_weather(date: &str, 
-                     latitude: &str, 
-                     longitude: &str, 
-                     timezone: &str) -> Result<super::Weather, Box<dyn std::error::Error>> {
-
+fn determine_weather_from_coordinates(date: &str, latitude: &str, longitude: &str, timezone: &str) -> Result<super::Weather, Box<dyn std::error::Error>> {
     // Getting weather info via API below...
-    let mut date_iter = date.split(" ");
-    let current_date_iso = date_iter
-                            .next()
-                            .unwrap()
-                            .trim();
-    let current_hour = date_iter
-                            .next()
-                            .unwrap()
-                            .split(":").next().unwrap().parse::<usize>().unwrap();
-    let timezone_url_ready = timezone.replace("/", "%2F");
+    let (current_date_iso, current_hour, timezone_url_ready) = super::calculators::split_date_time(date, timezone);
     let url = format!("https://api.open-meteo.com/v1/forecast?\
                                 latitude={latitude}\
                                 &longitude={longitude}\
@@ -121,10 +175,7 @@ fn determine_weather(date: &str,
                                 &start_date={current_date_iso}\
                                 &end_date={current_date_iso}");
     let api_response_bytes = super::query::call_api_generic(&url)?;
-
-    // Translate what we got from the server to native Rust structs
     let api_response_native: super::WeatherResult = serde_json::from_slice(&api_response_bytes)?;
-
     Ok(super::Weather {
         temperature:            api_response_native.hourly.temperature_2m[current_hour],
         apparent_temperature:   api_response_native.hourly.apparent_temperature[current_hour],
@@ -138,77 +189,5 @@ fn determine_weather(date: &str,
         uv_index:               api_response_native.daily.uv_index_max[0],
         sunrise:                api_response_native.daily.sunrise[0].split("T").last().unwrap().to_string(),
         sunset:                 api_response_native.daily.sunset[0].split("T").last().unwrap().to_string()
-        }
-    )
-}
-
-pub(crate) fn journal_init_driver() -> Result<(String, String), Box<dyn std::error::Error>> {
-    // Create a HashMap that maps integers to status strings
-    let weather_map = HashMap::from([
-        (0, "Clear skies"),
-        (1, "Mainly clear skies"),
-        (2, "Partly cloudy skies"),
-        (3, "Overcast skies"),
-        (45, "Fog"),
-        (48, "Fog"),
-        (51, "Light drizzle"),
-        (53, "Moderate drizzle"),
-        (55, "Heavy drizzle"),
-        (56, "Light drizzle, freezing"),
-        (57, "Moderate or heavy drizzle, freezing"),
-        (61, "Light rain"),
-        (63, "Moderate rain"),
-        (65, "Heavy rain"),
-        (66, "Light rain, freezing"),
-        (67, "Moderate or heavy rain, freezing"),
-        (71, "Snow fall: Slight intensity"),
-        (73, "Snow fall: Moderate intensity"),
-        (75, "Snow fall: Heavy intensity"),
-        (77, "Snow grains"),
-        (80, "Light rain showers"),
-        (81, "Moderate rain showers"),
-        (82, "Violent rainshowers"),
-        (85, "Snow showers: Slight intensity"),
-        (86, "Snow showers: Heavy intensity"),
-        (95, "Thunderstorm: Slight or moderate"),
-        (96, "Thunderstorm with slight hail"),
-        (99, "Thunderstorm with heavy hail"),
-    ]);
-
-    let (location, latitude, longitude, timezone) = get_location_info() ?;
-    let current_date = let_user_choose_desired_datetime(&timezone)?;
-    let current_weather = determine_weather(&(current_date.format("%Y-%m-%d %H:%M").to_string()), 
-                                                    latitude.to_string().as_str(), 
-                                                    longitude.to_string().as_str(), 
-                                                    &timezone)?;
-
-    let output_str = format!("DATE: {}\n\
-                            LOCATION: {}\n\
-                            \n\
-                            Temperature: {} C, feels like {} C, {}.\n\
-                            UV Index: {}  Sunrise: {}   Sunset: {}\n\
-                            Rain: {}mm\n\
-                            Winds: {}km/h {}\n\
-                            Pressure: {}hPa\n\
-                            Humidity: {}%\n\
-                            Visibility: {}km\
-                            ", 
-                            current_date.format("%a, %Y %b %d %H:%M:%S %Z (%:z)"),
-                            location,
-                            current_weather.temperature,
-                            current_weather.apparent_temperature,
-                            weather_map.get(&current_weather.weather_code).unwrap_or(&"Unknown conditions"),
-                            current_weather.uv_index,
-                            current_weather.sunrise,
-                            current_weather.sunset,
-                            current_weather.rain,
-                            current_weather.windspeed,
-                            super::calculators::get_direction(current_weather.winddirection),
-                            current_weather.pressure,
-                            current_weather.humidity,
-                            current_weather.visibility/1000.0);
-
-    let file_name = format!("~/journal/{}", current_date.format("%Y/%m/%d"));
-
-    Ok((output_str, file_name))
+    })
 }
