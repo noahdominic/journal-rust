@@ -45,11 +45,12 @@ pub(crate) fn create_file(file_path: &std::path::Path) -> Result<(), Box<dyn std
 /// A `Result` object that contains `()` if the preamble is successfully written to the file, or a `Box<dyn std::error::Error>` type if an error occurs.
 ///
 pub(crate) fn write_preamble(file_path: &std::path::Path, preamble: &str) -> Result<(), Box<dyn std::error::Error>> {
-    let mut file = std::fs::OpenOptions::new()
-                    .append(true)
-                    .create(true)
-                    .open(&file_path)?;
+    println!("{}", preamble);
     if super::query::query_for_bool("Does everything look correct?  This will print in the file if yes.")? {
+        let mut file = std::fs::OpenOptions::new()
+                        .append(true)
+                        .create(true)
+                        .open(&file_path)?;
         writeln!(file, "{}", preamble)?;
     } else {
         println!("OK.  File not written.")

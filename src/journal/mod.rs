@@ -8,7 +8,7 @@ mod file;
 mod query;
 
 #[derive(Debug, Deserialize)]
-struct Location {
+pub(crate) struct Location {
     name: String,
     latitude: f64,
     longitude: f64,

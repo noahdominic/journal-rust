@@ -82,7 +82,21 @@ pub(crate) fn query_for_usize(question: &str) -> Result<usize, Box<dyn std::erro
     Ok(user_response.trim().parse::<usize>()?)
 }
 
-pub(crate) fn call_api(url: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+/// Makes a generic API call to the given `url`, using the curl crate's Easy API.
+/// Returns a `Result` containing the response body as a vector of bytes on success,
+/// or an error wrapped in a `Box<dyn std::error::Error>` on failure.
+///
+/// # Arguments
+///
+/// * `url` - A string slice representing the URL to call the API on.
+///
+/// # Examples
+///
+/// ```
+/// let response_body = call_api_generic("https://example.com/api").unwrap();
+/// println!("{}", String::from_utf8_lossy(&response_body));
+/// ```
+pub(crate) fn call_api_generic(url: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     let mut api_caller = Easy::new();
     api_caller.url(url)?;
     let mut api_response_bytes = Vec::new();
@@ -95,4 +109,68 @@ pub(crate) fn call_api(url: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>>
         transfer.perform()?;
     }
     Ok(api_response_bytes)
+}
+
+/// Queries the user for their current location and returns it as a `String`.
+/// Returns a `Result` containing the location string on success,
+/// or an error wrapped in a `Box<dyn std::error::Error>` on failure.
+///
+/// # Arguments
+///
+/// This function takes no arguments.
+pub(crate) fn query_location_from_user() -> Result<String, Box<dyn std::error::Error>> {
+    let location: String = super::query::query_for_string("What's your current location", 
+                                                "<optional, addresses, here>, <city>") ?;
+    Ok(location)
+}
+
+/// Gets location information from the Open Meteo geocoding API for the given `full_location` string,
+/// which should include at least a city/country/island name. The last item in the comma-separated address
+/// will be used for the API query.
+/// Returns a `Result` containing a vector of `Location` objects on success,
+/// or an error wrapped in a `Box<dyn std::error::Error>` on failure.
+///
+/// # Arguments
+///
+/// * `full_location` - A string slice representing the full location to query for.
+pub(crate) fn get_location_info_from_api(full_location: &str) -> Result<Vec<super::Location>, Box<dyn std::error::Error>> {
+    let city = full_location.split(",")
+                                    .last()
+                                    .unwrap()
+                                    .trim() // Removes trailing spaces
+                                    .replace(" ", "%20");   // Makes string URL-ready
+    let url = format!("https://geocoding-api.open-meteo.com/v1/search?name={city}");
+    let api_response_bytes = super::query::call_api_generic(&url)?;
+    let api_response_native: super::GeoResult = serde_json::from_slice(&api_response_bytes)?;
+    Ok(api_response_native.results)
+}
+
+/// Allows the user to choose a location from a vector of `Location` objects.
+/// If the vector is empty, an error is returned.
+/// If the vector contains only one location, that location is returned.
+/// If the vector contains multiple locations, the user is prompted to choose one by number.
+///
+/// Returns a `Result` containing a reference to the chosen `Location` object on success,
+/// or an error wrapped in a `Box<dyn std::error::Error>` on failure.
+///
+/// # Arguments
+///
+/// * `results` - A slice of `Location` objects representing the search results to choose from.
+pub(crate) fn choose_location_from_results(results: &[super::Location]) -> Result<&super::Location, Box<dyn std::error::Error>> {
+    if results.is_empty() {
+        Err("The location with that name found in the database".into())
+    } else if results.len() == 1 {
+        Ok(&results[0])
+    } else {
+        println!("Multiple locations found with the name '{}'. Choose one:", results[0].name);
+        for (i, result) in results.iter().enumerate() {
+            println!("{}. {}", i + 1, result);
+        }
+        let choice: usize = super::query::query_for_usize("Enter the number of the city you're in")?;
+        if choice > 0 && choice <= results.len() {
+            Ok(&results[choice - 1])
+        } else {
+            Err("Invalid choice".into())
+        }
+    }
 }

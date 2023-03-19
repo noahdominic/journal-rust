@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use isocountry;
 
 /// Determines the current date and time that a user wants.  By default, it
 /// chooses the time at the timezone in the argument
@@ -44,46 +43,18 @@ fn let_user_choose_desired_datetime(timezone: &str) -> Result<chrono::DateTime<c
 ///
 /// Returns an error in the form of a string slice if an error occurs while
 /// processing the user's input location or if the geocoding API does not return any results.
-fn determine_location_info() -> Result<(String, f64, f64, String), Box<dyn std::error::Error>>  {
+fn get_location_info() -> Result<(String, f64, f64, String), Box<dyn std::error::Error>>  {
     // Uses determine_generic_query to ask user for location
-    let full_location: String = super::query::query_for_string("What's your current location", 
-                                                "<optional, addresses, here>, <city>") ?;
+    let full_location: String = super::query::query_location_from_user()?;
 
-    // Getting city info via API below...
-    let city = full_location.split(",")
-                                    .last()
-                                    .unwrap()
-                                    .trim() // Removes trailing spaces
-                                    .replace(" ", "%20");   // Makes string URL-ready
-    let url = format!("https://geocoding-api.open-meteo.com/v1/search?name={city}");
-    let api_response_bytes = super::query::call_api(&url)?;
+    // Getting location info via API below...
+    let api_response_native = super::query::get_location_info_from_api(&full_location)?;
 
-    // Translate what we got from the server to native Rust structs
-    let api_response_native: super::GeoResult = serde_json::from_slice(&api_response_bytes)?;
-
-    // Prompt user to choose a city from the API response
-    let mut city_info: Option<&super::Location> = None;
-    while city_info.is_none() {
-        println!("Multiple locations found with name '{}'. Choose one:", city);
-        for (i, result) in api_response_native.results.iter().enumerate() {
-            println!("{}.  {}", i+1, result);
-        }
-        let choice: usize = super::query::query_for_usize("Enter the number of the city you're in")?;
-        if choice > 0 && choice <= api_response_native.results.len() {
-            city_info = Some(&api_response_native.results[choice-1]);
-        } else {
-            println!("Invalid choice. Please enter a number between 1 and {}.", api_response_native.results.len());
-        }
-    }
-
-    let city_info = city_info.unwrap();
+    // Let user choose which location they want
+    let city_info = super::query::choose_location_from_results(&api_response_native) ?;
     
-    println!("\nYou are currently in {}, {} ({}, {}) in {}.", 
-            city_info.name,
-            isocountry::CountryCode::for_alpha2(&(city_info.country_code)) ?,
-            city_info.latitude,
-            city_info.longitude,
-            city_info.timezone);
+    println!("\nYou are currently in {}.", 
+            city_info);
 
     Ok((full_location,
         city_info.latitude,
@@ -149,7 +120,7 @@ fn determine_weather(date: &str,
                                 &timezone={timezone_url_ready}\
                                 &start_date={current_date_iso}\
                                 &end_date={current_date_iso}");
-    let api_response_bytes = super::query::call_api(&url)?;
+    let api_response_bytes = super::query::call_api_generic(&url)?;
 
     // Translate what we got from the server to native Rust structs
     let api_response_native: super::WeatherResult = serde_json::from_slice(&api_response_bytes)?;
@@ -173,7 +144,6 @@ fn determine_weather(date: &str,
 
 pub(crate) fn journal_init_driver() -> Result<(String, String), Box<dyn std::error::Error>> {
     // Create a HashMap that maps integers to status strings
-    // COULDDO  There should be a better way to execute this.  A HashMap seems excessive.
     let weather_map = HashMap::from([
         (0, "Clear skies"),
         (1, "Mainly clear skies"),
@@ -205,7 +175,7 @@ pub(crate) fn journal_init_driver() -> Result<(String, String), Box<dyn std::err
         (99, "Thunderstorm with heavy hail"),
     ]);
 
-    let (location, latitude, longitude, timezone) = determine_location_info() ?;
+    let (location, latitude, longitude, timezone) = get_location_info() ?;
     let current_date = let_user_choose_desired_datetime(&timezone)?;
     let current_weather = determine_weather(&(current_date.format("%Y-%m-%d %H:%M").to_string()), 
                                                     latitude.to_string().as_str(), 
