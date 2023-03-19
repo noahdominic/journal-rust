@@ -22,7 +22,7 @@ fn let_user_choose_desired_datetime(timezone: &str) -> Result<chrono::DateTime<c
         println!("According to your given timezone, it is currently {:?}.", 
             current_date.format("%Y %b %d %H:%M:%S %Z (%:z)").to_string());
 
-        match super::query::query_for_bool("Is this the timezone you want to use?", "y/N") ? {
+        match super::query::query_for_bool("Is this the timezone you want to use?") ? {
             true => { return Ok(current_date) },
             false => { timezone = super::query::query_for_string("What should the timezone be?", "Enter an IANA Timezone ") ?}
         };
@@ -62,19 +62,13 @@ fn determine_location_info() -> Result<(String, f64, f64, String), Box<dyn std::
     let api_response_native: super::GeoResult = serde_json::from_slice(&api_response_bytes)?;
 
     // Prompt user to choose a city from the API response
-    let mut city_info: Option<&super::GeoCity> = None;
+    let mut city_info: Option<&super::Location> = None;
     while city_info.is_none() {
-        println!("Multiple cities found with name '{}'. Choose one:", city);
+        println!("Multiple locations found with name '{}'. Choose one:", city);
         for (i, result) in api_response_native.results.iter().enumerate() {
-            println!("{}. {}, {} ({}, {}) in {}", 
-                    i+1,
-                    result.name,
-                    isocountry::CountryCode::for_alpha2(&(result.country_code)).unwrap(),
-                    result.latitude,
-                    result.longitude,
-                    result.timezone);
+            println!("{}.  {}", i+1, result);
         }
-        let choice: usize = super::query::query_for_usize("Enter the number of the city you're in", "")?;
+        let choice: usize = super::query::query_for_usize("Enter the number of the city you're in")?;
         if choice > 0 && choice <= api_response_native.results.len() {
             city_info = Some(&api_response_native.results[choice-1]);
         } else {
@@ -82,6 +76,8 @@ fn determine_location_info() -> Result<(String, f64, f64, String), Box<dyn std::
         }
     }
 
+    let city_info = city_info.unwrap();
+    
     println!("\nYou are currently in {}, {} ({}, {}) in {}.", 
             city_info.name,
             isocountry::CountryCode::for_alpha2(&(city_info.country_code)) ?,
