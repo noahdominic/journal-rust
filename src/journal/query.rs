@@ -21,7 +21,6 @@ macro_rules! lnprint {
 ///
 /// An `Result<String, std::io::Error>` containing the user's input,
 /// or `std::io::Error` if an error occurred while reading the input.
-/// 
 pub(crate) fn query_for_string(question: &str, hint: &str) -> Result<String, std::io::Error> {
     // Prompt the user with the question and hint.
     lnprint!("{} [{}]: ", question, hint);
@@ -51,7 +50,6 @@ pub(crate) fn query_for_string(question: &str, hint: &str) -> Result<String, std
 /// # Note
 /// 
 /// This function is dependent on `query_for_string()`.
-/// 
 pub(crate) fn query_for_bool(question: &str) -> Result<bool, std::io::Error> {
     // This is very condensed so here's a more readable summary:
     // - `query_for_string()` is called and passes `question` and `hint`.
@@ -89,13 +87,6 @@ pub(crate) fn query_for_usize(question: &str) -> Result<usize, Box<dyn std::erro
 /// # Arguments
 ///
 /// * `url` - A string slice representing the URL to call the API on.
-///
-/// # Examples
-///
-/// ```
-/// let response_body = call_api_generic("https://example.com/api").unwrap();
-/// println!("{}", String::from_utf8_lossy(&response_body));
-/// ```
 pub(crate) fn call_api_generic(url: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     let mut api_caller = Easy::new();
     api_caller.url(url)?;
