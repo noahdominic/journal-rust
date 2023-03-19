@@ -46,7 +46,7 @@ pub(crate) fn create_file(file_path: &std::path::Path) -> Result<(), Box<dyn std
 ///
 pub(crate) fn write_preamble(file_path: &std::path::Path, preamble: &str) -> Result<(), Box<dyn std::error::Error>> {
     println!("{}", preamble);
-    if super::query::generic::query_for_bool("Does everything look correct?  This will print in the file if yes.")? {
+    if crate::journal::query::for_bool("Does everything look correct?  This will print in the file if yes.")? {
         let mut file = std::fs::OpenOptions::new()
                         .append(true)
                         .create(true)
