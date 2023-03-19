@@ -47,11 +47,3 @@ pub(crate) fn get_current_date_from_tz(tz_as_str: &str) -> Result<chrono::DateTi
     return Ok(chrono::Utc::now().with_timezone(&timezone));
 }
 
-
-pub(crate) fn split_date_time(date: &str, timezone: &str) -> (String, usize, String) {
-    let mut date_iter = date.split_whitespace();
-    let current_date_iso = date_iter.next().unwrap().trim().to_string();
-    let current_hour = date_iter.next().unwrap().split(":").next().unwrap().parse::<usize>().unwrap();
-    let timezone_url_ready = timezone.replace("/", "%2F");
-    (current_date_iso, current_hour, timezone_url_ready)
-}
