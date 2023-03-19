@@ -8,7 +8,7 @@ pub(crate) mod generic;
 ///
 /// This function takes no arguments.
 pub(crate) fn query_location_from_user() -> Result<String, Box<dyn std::error::Error>> {
-    let location: String = super::query::generic::query_for_string("What's your current location", 
+    let location: String = super::query::generic::query_for_string("What's your current location?", 
                                                 "<optional, addresses, here>, <city>") ?;
     Ok(location)
 }
