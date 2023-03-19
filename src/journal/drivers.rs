@@ -1,67 +1,5 @@
-use std::io::Write;
-use curl::easy;
 use std::collections::HashMap;
 use isocountry;
-
-/// Prints a string in with blank line paddings
-macro_rules! lnprint {
-    ($($arg:tt)*) => {{
-        println!();
-        print!($($arg)*);
-    }}
-}
-
-/// Handles a generic query by prompting the user with a question and hint, and
-/// reading their input from the standard input stream, which is returned as a `String`
-///
-/// # Arguments
-///
-/// * `question`: A string slice representing the question to be displayed to the user.
-/// * `hint`: A string slice representing a hint or example value to be displayed to the user.
-///
-/// # Returns
-///
-/// An `Result<String, std::io::Error>` containing the user's input,
-/// or `std::io::Error` if an error occurred while reading the input.
-/// 
-fn query_for_string(question: &str, hint: &str) -> Result<String, std::io::Error> {
-    // Prompt the user with the question and hint.
-    lnprint!("{} [{}]: ", question, hint);
-    std::io::stdout().flush().expect("Error: Flush failed!");
-    
-    // Read the user's input from the standard input stream.
-    let mut user_response = String::new();
-    std::io::stdin().read_line(&mut user_response).expect("Error: Reading failed!");
-
-    // Return the user's input, with the trailing newline trimmed, as an `Ok`.
-    Ok(user_response.trim_end().to_string())
-}
-
-/// Handles a generic query by prompting the user with a question and hint, and
-/// reading their input from the standard input stream, which is returned as a `String`
-///
-/// # Arguments
-///
-/// * `question`: A string slice representing the question to be displayed to the user.
-/// * `hint`: A string slice representing a hint or example value to be displayed to the user.
-///
-/// # Returns
-///
-/// An `Result<String, std::io::Error>` containing the user's input,
-/// or `std::io::Error` if an error occurred while reading the input.
-///
-/// # Note
-/// 
-/// This function is dependent on `query_for_string()`.
-/// 
-fn query_for_bool(question: &str, hint: &str) -> Result<bool, std::io::Error> {
-    // This is very condensed so here's a more readable summary:
-    // - `query_for_string()` is called and passes `question` and `hint`.
-    // - The returned string is then checked if it's "yes" or "y".
-    // - This yes-ness is wrapped in an `Ok()` and returned
-    let answer = query_for_string(question, hint)?.trim().to_lowercase();
-    Ok(answer == "yes" || answer == "y")
-}
 
 /// Determines the current date and time that a user wants.  By default, it
 /// chooses the time at the timezone in the argument
@@ -77,16 +15,16 @@ fn query_for_bool(question: &str, hint: &str) -> Result<bool, std::io::Error> {
 ///     the current date and time in the given timezone 
 /// - or an `Box<dyn std::error::Error>` if something went wrong while determining the date and time.
 /// 
-fn choose_desired_datetime(timezone: &str) -> Result<chrono::DateTime<chrono_tz::Tz>, Box<dyn std::error::Error>> {
+fn let_user_choose_desired_datetime(timezone: &str) -> Result<chrono::DateTime<chrono_tz::Tz>, Box<dyn std::error::Error>> {
     let mut timezone = String::from(timezone);
     loop {
         let current_date = super::calculators::get_current_date_from_tz(&timezone) ?;
         println!("According to your given timezone, it is currently {:?}.", 
             current_date.format("%Y %b %d %H:%M:%S %Z (%:z)").to_string());
 
-        match query_for_bool("Is this the timezone you want to use?", "y/N") ? {
+        match super::query::query_for_bool("Is this the timezone you want to use?", "y/N") ? {
             true => { return Ok(current_date) },
-            false => { timezone = query_for_string("What should the timezone be?", "Enter an IANA Timezone ") ?}
+            false => { timezone = super::query::query_for_string("What should the timezone be?", "Enter an IANA Timezone ") ?}
         };
     }
 }
@@ -108,42 +46,41 @@ fn choose_desired_datetime(timezone: &str) -> Result<chrono::DateTime<chrono_tz:
 /// processing the user's input location or if the geocoding API does not return any results.
 fn determine_location_info() -> Result<(String, f64, f64, String), Box<dyn std::error::Error>>  {
     // Uses determine_generic_query to ask user for location
-    let full_location: String = query_for_string("What's your current location", 
+    let full_location: String = super::query::query_for_string("What's your current location", 
                                                 "<optional, addresses, here>, <city>") ?;
 
     // Getting city info via API below...
-    let mut api_caller = easy::Easy::new();
     let city = full_location.split(",")
                                     .last()
                                     .unwrap()
                                     .trim() // Removes trailing spaces
                                     .replace(" ", "%20");   // Makes string URL-ready
     let url = format!("https://geocoding-api.open-meteo.com/v1/search?name={city}");
-    println!("{}", url);
-    // set the URL in api_caller
-    api_caller.url(url.as_str()) ?;
-    let mut api_response_bytes = Vec::new();
-    // NOTE     I'm honestly confused why scoping is necessary here.  
-    //          Something to do about Rust's borrowing rules.
-    {
-        let mut transfer = api_caller.transfer();
-        // set the write_function in api_caller
-        transfer.write_function( |received_data| {
-            api_response_bytes.extend_from_slice(received_data);
-            Ok(received_data.len())
-        })?;
-        // perform the API call
-        transfer.perform() ?;
-    }
+    let api_response_bytes = super::query::call_api(&url)?;
 
     // Translate what we got from the server to native Rust structs
     let api_response_native: super::GeoResult = serde_json::from_slice(&api_response_bytes)?;
 
-    // TODO     Choosing the 0th item is completely arbitrary.
-    //          We should find a way to let the use pick. 
-    //          There are multiple cities with the same name.
-    
-    let city_info = &api_response_native.results[0];
+    // Prompt user to choose a city from the API response
+    let mut city_info: Option<&super::GeoCity> = None;
+    while city_info.is_none() {
+        println!("Multiple cities found with name '{}'. Choose one:", city);
+        for (i, result) in api_response_native.results.iter().enumerate() {
+            println!("{}. {}, {} ({}, {}) in {}", 
+                    i+1,
+                    result.name,
+                    isocountry::CountryCode::for_alpha2(&(result.country_code)).unwrap(),
+                    result.latitude,
+                    result.longitude,
+                    result.timezone);
+        }
+        let choice: usize = super::query::query_for_usize("Enter the number of the city you're in", "")?;
+        if choice > 0 && choice <= api_response_native.results.len() {
+            city_info = Some(&api_response_native.results[choice-1]);
+        } else {
+            println!("Invalid choice. Please enter a number between 1 and {}.", api_response_native.results.len());
+        }
+    }
 
     println!("\nYou are currently in {}, {} ({}, {}) in {}.", 
             city_info.name,
@@ -186,10 +123,7 @@ fn determine_weather(date: &str,
                      timezone: &str) -> Result<super::Weather, Box<dyn std::error::Error>> {
 
     // Getting weather info via API below...
-    let mut api_caller = easy::Easy::new();
-
     let mut date_iter = date.split(" ");
-
     let current_date_iso = date_iter
                             .next()
                             .unwrap()
@@ -198,9 +132,7 @@ fn determine_weather(date: &str,
                             .next()
                             .unwrap()
                             .split(":").next().unwrap().parse::<usize>().unwrap();
-
     let timezone_url_ready = timezone.replace("/", "%2F");
-
     let url = format!("https://api.open-meteo.com/v1/forecast?\
                                 latitude={latitude}\
                                 &longitude={longitude}\
@@ -221,24 +153,10 @@ fn determine_weather(date: &str,
                                 &timezone={timezone_url_ready}\
                                 &start_date={current_date_iso}\
                                 &end_date={current_date_iso}");
-    
-    // set the URL in api_caller
-    api_caller.url(url.as_str()) ?;
-    let mut api_response_bytes = Vec::new();
-    // NOTE  I'm honestly confused why scoping is necessary here.  Something to do about Rust's borrowing rules.
-    {
-        let mut transfer = api_caller.transfer();
-        // set the write_function in api_caller
-        transfer.write_function(|received_data| {
-            api_response_bytes.extend_from_slice(received_data);
-            Ok(received_data.len())
-        })?;
-        // perform the API call
-        transfer.perform()?;
-    }
+    let api_response_bytes = super::query::call_api(&url)?;
 
     // Translate what we got from the server to native Rust structs
-    let api_response_native: super::WeatherResult = serde_json::from_slice(&api_response_bytes) ?;
+    let api_response_native: super::WeatherResult = serde_json::from_slice(&api_response_bytes)?;
 
     Ok(super::Weather {
         temperature:            api_response_native.hourly.temperature_2m[current_hour],
@@ -292,11 +210,11 @@ pub(crate) fn journal_init_driver() -> Result<(String, String), Box<dyn std::err
     ]);
 
     let (location, latitude, longitude, timezone) = determine_location_info() ?;
-    let current_date = choose_desired_datetime(&timezone)?;
+    let current_date = let_user_choose_desired_datetime(&timezone)?;
     let current_weather = determine_weather(&(current_date.format("%Y-%m-%d %H:%M").to_string()), 
                                                     latitude.to_string().as_str(), 
                                                     longitude.to_string().as_str(), 
-                                                    &timezone) ?;
+                                                    &timezone)?;
 
     let output_str = format!("DATE: {}\n\
                             LOCATION: {}\n\
@@ -325,8 +243,6 @@ pub(crate) fn journal_init_driver() -> Result<(String, String), Box<dyn std::err
                             current_weather.visibility/1000.0);
 
     let file_name = format!("~/journal/{}", current_date.format("%Y/%m/%d"));
-
-    println!("\n\n{}", output_str);
 
     Ok((output_str, file_name))
 }

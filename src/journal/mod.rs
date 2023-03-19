@@ -3,6 +3,7 @@ use std;
 use std::io::Write;
 use dirs;
 
+mod query;
 mod drivers;
 mod calculators;
 
@@ -87,7 +88,7 @@ pub fn main_driver() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n\nThis will print in: {}\n{}", file_path.display(), preamble);
     
     // This is the file of the journal entry
-    let mut _file = std::fs::OpenOptions::new()
+    let mut file = std::fs::OpenOptions::new()
                             .append(true)
                             .create(true)
                             .open(&file_path)?;    
@@ -95,12 +96,3 @@ pub fn main_driver() -> Result<(), Box<dyn std::error::Error>> {
     writeln!(&mut file, "{}", preamble)?;
     Ok(())
 }
-
-
-
-
-
-
-
-
-
