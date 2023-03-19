@@ -115,6 +115,32 @@ pub(crate) fn query_location_from_user() -> Result<String, Box<dyn std::error::E
     Ok(location)
 }
 
+/// Queries the current date and time that a user wants.  By default, it
+/// chooses the time at the timezone in the argument
+/// 
+/// # Arguments
+/// 
+/// * `timezone`: A `String` object representing a IANA timezone to be used to determine the current time
+/// 
+/// # Returns
+/// 
+/// A `Result` that contains either 
+/// - a `chrono::DateTime<chrono_tz::Tz>` value representing 
+///     the current date and time in the given timezone 
+/// - or an `Box<dyn std::error::Error>` if something went wrong while determining the date and time.
+pub(crate) fn query_desired_datetime_from_user(timezone: &str) -> Result<chrono::DateTime<chrono_tz::Tz>, Box<dyn std::error::Error>> {
+    let mut timezone = String::from(timezone);
+    loop {
+        let current_date = super::calculators::get_current_date_from_tz(&timezone) ?;
+        println!("According to your given timezone, it is currently {:?}.", 
+            current_date.format("%Y %b %d %H:%M:%S %Z (%:z)").to_string());
+        match super::query::query_for_bool("Is this the timezone you want to use?") ? {
+            true => { return Ok(current_date) },
+            false => { timezone = super::query::query_for_string("What should the timezone be?", "Enter an IANA Timezone ") ?}
+        };
+    }
+}
+
 /// Gets location information from the Open Meteo geocoding API for the given `full_location` string,
 /// which should include at least a city/country/island name. The last item in the comma-separated address
 /// will be used for the API query.
@@ -165,3 +191,4 @@ pub(crate) fn choose_location_from_results(results: &[super::Location]) -> Resul
         }
     }
 }
+

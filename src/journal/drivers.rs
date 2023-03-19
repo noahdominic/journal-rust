@@ -33,8 +33,8 @@ pub(crate) fn journal_init_driver() -> Result<(String, String), Box<dyn std::err
         (99, "Thunderstorm with heavy hail"),
     ]);
     let (location, latitude, longitude, timezone) = get_location_info()?;
-    let current_date = let_user_choose_desired_datetime(&timezone)?;
-    let current_weather = determine_weather_from_coordinates(&(current_date.format("%Y-%m-%d %H:%M").to_string()), 
+    let current_date = super::query::query_desired_datetime_from_user(&timezone)?;
+    let current_weather = super::query::get_weather_info_from_api(&(current_date.format("%Y-%m-%d %H:%M").to_string()), 
                                                                     latitude.to_string().as_str(), 
                                                                     longitude.to_string().as_str(), 
                                                                     &timezone)?;
@@ -103,91 +103,3 @@ fn get_location_info() -> Result<(String, f64, f64, String), Box<dyn std::error:
         city_info.timezone.clone()))
 }
 
-/// Determines the current date and time that a user wants.  By default, it
-/// chooses the time at the timezone in the argument
-/// 
-/// # Arguments
-/// 
-/// * `timezone`: A `String` object representing a IANA timezone to be used to determine the current time
-/// 
-/// # Returns
-/// 
-/// A `Result` that contains either 
-/// - a `chrono::DateTime<chrono_tz::Tz>` value representing 
-///     the current date and time in the given timezone 
-/// - or an `Box<dyn std::error::Error>` if something went wrong while determining the date and time.
-fn let_user_choose_desired_datetime(timezone: &str) -> Result<chrono::DateTime<chrono_tz::Tz>, Box<dyn std::error::Error>> {
-    let mut timezone = String::from(timezone);
-    loop {
-        let current_date = super::calculators::get_current_date_from_tz(&timezone) ?;
-        println!("According to your given timezone, it is currently {:?}.", 
-            current_date.format("%Y %b %d %H:%M:%S %Z (%:z)").to_string());
-        match super::query::query_for_bool("Is this the timezone you want to use?") ? {
-            true => { return Ok(current_date) },
-            false => { timezone = super::query::query_for_string("What should the timezone be?", "Enter an IANA Timezone ") ?}
-        };
-    }
-}
-
-/// Retrieves the current weather conditions (at a specific date and time) 
-/// for a given location. 
-/// This makes an API call to the Open Meteo API 
-/// to get weather data and 
-/// then returns a CurrentWeather object that 
-/// contains information about the weather at the specified location.
-/// 
-/// # Arguments
-/// * date: A string representing the date and time for which the weather data is to be retrieved. 
-///     The date should be in ISO format, i.e., "YYYY-MM-DD HH:MM:SS". 
-///     The hour is not optional and should be in 24-hour format.
-///     The minute and seconds are never checked.
-/// * latitude: A string representing the latitude of the location 
-///     for which the weather data is to be retrieved.
-///     This should be in decimal form.
-/// * longitude: A string representing the longitude of the location 
-///     for which the weather data is to be retrieved.
-///     This should be in decimal form.
-/// * timezone: A string representing the timezone of the location 
-///     for which the weather data is to be retrieved. 
-///     The timezone should be in "Area/Location" format, such as "Europe/London".
-///     See IANA timezone databases for reference.
-fn determine_weather_from_coordinates(date: &str, latitude: &str, longitude: &str, timezone: &str) -> Result<super::Weather, Box<dyn std::error::Error>> {
-    // Getting weather info via API below...
-    let (current_date_iso, current_hour, timezone_url_ready) = super::calculators::split_date_time(date, timezone);
-    let url = format!("https://api.open-meteo.com/v1/forecast?\
-                                latitude={latitude}\
-                                &longitude={longitude}\
-                                &hourly=\
-                                    temperature_2m,\
-                                    relativehumidity_2m,\
-                                    apparent_temperature,\
-                                    rain,\
-                                    pressure_msl,\
-                                    visibility,\
-                                    windspeed_120m,\
-                                    winddirection_120m,\
-                                    weathercode\
-                                &daily=\
-                                    sunrise,\
-                                    sunset,\
-                                    uv_index_max\
-                                &timezone={timezone_url_ready}\
-                                &start_date={current_date_iso}\
-                                &end_date={current_date_iso}");
-    let api_response_bytes = super::query::call_api_generic(&url)?;
-    let api_response_native: super::WeatherResult = serde_json::from_slice(&api_response_bytes)?;
-    Ok(super::Weather {
-        temperature:            api_response_native.hourly.temperature_2m[current_hour],
-        apparent_temperature:   api_response_native.hourly.apparent_temperature[current_hour],
-        weather_code:           api_response_native.hourly.weathercode[current_hour],
-        rain:                   api_response_native.hourly.rain[current_hour],
-        windspeed:              api_response_native.hourly.windspeed_120m[current_hour],
-        winddirection:          api_response_native.hourly.winddirection_120m[current_hour],
-        pressure:               api_response_native.hourly.pressure_msl[current_hour],
-        humidity:               api_response_native.hourly.relativehumidity_2m[current_hour],
-        visibility:             api_response_native.hourly.visibility[current_hour],
-        uv_index:               api_response_native.daily.uv_index_max[0],
-        sunrise:                api_response_native.daily.sunrise[0].split("T").last().unwrap().to_string(),
-        sunset:                 api_response_native.daily.sunset[0].split("T").last().unwrap().to_string()
-    })
-}

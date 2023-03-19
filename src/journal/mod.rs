@@ -35,7 +35,7 @@ impl std::fmt::Display for Location {
     }
 }
 
-struct Weather {
+pub(crate) struct Weather {
     temperature: f64,
     apparent_temperature: f64,
     weather_code: usize,
