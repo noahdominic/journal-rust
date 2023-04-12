@@ -7,6 +7,8 @@ mod drivers;
 mod file;
 mod query;
 
+mod test;
+
 #[derive(Debug, Deserialize)]
 pub(crate) struct Location {
     name: String,
