@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 chrono = "0.4.23"
 chrono-tz = "0.8.1"
+clap = { version = "4.3.5", features = ["derive"] }
 curl = "0.4.44"
 dirs = "4.0.0"
 isocountry = "0.3.2"

@@ -2,10 +2,15 @@ use isocountry;
 use serde::Deserialize;
 use std;
 
+mod args;
 mod calculators;
 mod drivers;
 mod file;
 mod query;
+
+use clap::Parser;
+
+use crate::journal::args::JournalCommand;
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct Location {
@@ -109,9 +114,16 @@ struct WeatherResult {
 /// a `Box<dyn std::error::Error` which is the error that is passed on from the subfunctions
 ///     if there are any errors inc
 pub fn journal_main_driver() -> Result<(), Box<dyn std::error::Error>> {
-    let (preamble, file_name) = drivers::journal_init_driver()?;
-    let file_path = file::expand_file_path(&file_name)?;
-    file::create_file(&file_path)?;
-    file::write_preamble(&file_path, &preamble)?;
+    let args = args::JournalArgs::parse();
+    if let Some(command) = args.journal_command {
+        match command {
+            JournalCommand::New => {
+                let (preamble, file_name) = drivers::journal_init_driver()?;
+                let file_path = file::expand_file_path(&file_name)?;
+                file::create_file(&file_path)?;
+                file::write_preamble(&file_path, &preamble)?;
+            }
+        }
+    }
     Ok(())
 }
