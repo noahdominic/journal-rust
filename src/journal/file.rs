@@ -1,5 +1,5 @@
-use std::io::Write;
 use dirs;
+use std::io::Write;
 
 /// Expands a given file name to a full file path by replacing the `~` symbol with the user's home directory.
 ///
@@ -11,7 +11,9 @@ use dirs;
 ///
 /// A `Result` object that contains a `std::path::PathBuf` type if the file path is successfully expanded, or a `Box<dyn std::error::Error>` type if an error occurs.
 ///
-pub(crate) fn expand_file_path(file_name: &str) -> Result<std::path::PathBuf, Box<dyn std::error::Error>> {
+pub(crate) fn expand_file_path(
+    file_name: &str,
+) -> Result<std::path::PathBuf, Box<dyn std::error::Error>> {
     let file_path = std::path::Path::new(file_name);
     let home_dir = dirs::home_dir().ok_or("Could not determine home directory")?;
     let file_path = home_dir.join(file_path.strip_prefix("~")?);
@@ -29,7 +31,11 @@ pub(crate) fn expand_file_path(file_name: &str) -> Result<std::path::PathBuf, Bo
 /// A `Result` object that contains `()` if the directory path is successfully created, or a `Box<dyn std::error::Error>` type if an error occurs.
 ///
 pub(crate) fn create_file(file_path: &std::path::Path) -> Result<(), Box<dyn std::error::Error>> {
-    std::fs::create_dir_all(file_path.parent().ok_or("Could not determine parent directory")?)?;
+    std::fs::create_dir_all(
+        file_path
+            .parent()
+            .ok_or("Could not determine parent directory")?,
+    )?;
     Ok(())
 }
 
@@ -44,13 +50,18 @@ pub(crate) fn create_file(file_path: &std::path::Path) -> Result<(), Box<dyn std
 ///
 /// A `Result` object that contains `()` if the preamble is successfully written to the file, or a `Box<dyn std::error::Error>` type if an error occurs.
 ///
-pub(crate) fn write_preamble(file_path: &std::path::Path, preamble: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub(crate) fn write_preamble(
+    file_path: &std::path::Path,
+    preamble: &str,
+) -> Result<(), Box<dyn std::error::Error>> {
     println!("{}", preamble);
-    if crate::journal::query::for_bool("Does everything look correct?  This will print in the file if yes.")? {
+    if crate::journal::query::for_bool(
+        "Does everything look correct?  This will print in the file if yes.",
+    )? {
         let mut file = std::fs::OpenOptions::new()
-                        .append(true)
-                        .create(true)
-                        .open(&file_path)?;
+            .append(true)
+            .create(true)
+            .open(&file_path)?;
         writeln!(file, "{}", preamble)?;
     } else {
         println!("OK.  File not written.")

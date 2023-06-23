@@ -32,13 +32,17 @@ pub(crate) fn journal_init_driver() -> Result<(String, String), Box<dyn std::err
         (96, "Thunderstorm with slight hail"),
         (99, "Thunderstorm with heavy hail"),
     ]);
-    let (location, latitude, longitude, timezone) = crate::journal::query::user::for_current_location()?;
+    let (location, latitude, longitude, timezone) =
+        crate::journal::query::user::for_current_location()?;
     let current_date = crate::journal::query::user::for_desired_datetime(&timezone)?;
-    let current_weather = crate::journal::query::api::for_weather_info(&(current_date.format("%Y-%m-%d %H:%M").to_string()), 
-                                                                    latitude.to_string().as_str(), 
-                                                                    longitude.to_string().as_str(), 
-                                                                    &timezone)?;
-    let output_str = format!("DATE: {}\n\
+    let current_weather = crate::journal::query::api::for_weather_info(
+        &(current_date.format("%Y-%m-%d %H:%M").to_string()),
+        latitude.to_string().as_str(),
+        longitude.to_string().as_str(),
+        &timezone,
+    )?;
+    let output_str = format!(
+        "DATE: {}\n\
                             LOCATION: {}\n\
                             \n\
                             Temperature: {} C, feels like {} C, {}.\n\
@@ -48,25 +52,26 @@ pub(crate) fn journal_init_driver() -> Result<(String, String), Box<dyn std::err
                             Pressure: {}hPa\n\
                             Humidity: {}%\n\
                             Visibility: {}km\
-                            ", 
-                            current_date.format("%a, %Y %b %d %H:%M:%S %Z (%:z)"),
-                            location,
-                            current_weather.temperature,
-                            current_weather.apparent_temperature,
-                            weather_map.get(&current_weather.weather_code).unwrap_or(&"Unknown conditions"),
-                            current_weather.uv_index,
-                            current_weather.sunrise,
-                            current_weather.sunset,
-                            current_weather.rain,
-                            current_weather.windspeed,
-                            crate::journal::calculators::get_direction(current_weather.winddirection),
-                            current_weather.pressure,
-                            current_weather.humidity,
-                            current_weather.visibility/1000.0);
+                            ",
+        current_date.format("%a, %Y %b %d %H:%M:%S %Z (%:z)"),
+        location,
+        current_weather.temperature,
+        current_weather.apparent_temperature,
+        weather_map
+            .get(&current_weather.weather_code)
+            .unwrap_or(&"Unknown conditions"),
+        current_weather.uv_index,
+        current_weather.sunrise,
+        current_weather.sunset,
+        current_weather.rain,
+        current_weather.windspeed,
+        crate::journal::calculators::get_direction(current_weather.winddirection),
+        current_weather.pressure,
+        current_weather.humidity,
+        current_weather.visibility / 1000.0
+    );
 
     let file_name = format!("~/journal/{}", current_date.format("%Y/%m/%d"));
 
     Ok((output_str, file_name))
 }
-
-

@@ -11,13 +11,16 @@
 /// assert_eq!(direction, "NE");
 /// ```
 pub(crate) fn get_direction(degrees: f64) -> String {
-    let directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+    let directions = [
+        "N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW",
+        "NW", "NNW",
+    ];
     let index = ((degrees + 11.25) / 22.5) as usize % 16;
     return String::from(directions[index]);
 }
 
 /// Returns the current date and time in the specified timezone.
-/// 
+///
 /// # Arguments
 ///
 /// * `tz_as_str` - A string representing the timezone to use for formatting the date.
@@ -28,7 +31,7 @@ pub(crate) fn get_direction(degrees: f64) -> String {
 ///
 /// # Returns
 ///
-/// A `Result` containing a 
+/// A `Result` containing a
 /// `chrono::DateTime<chrono_tz::Tz>` of the current date and time in the specified timezone
 /// or a `chrono_tz::ParseError` when `tz_as_str` is an invalid IANA timezone name.
 ///
@@ -42,15 +45,24 @@ pub(crate) fn get_direction(degrees: f64) -> String {
 /// let current_date: DateTime<Tz> = get_current_date(tz_str).unwrap();
 /// println!("{}", current_date);
 /// ```
-pub(crate) fn get_current_date_from_tz(tz_as_str: &str) -> Result<chrono::DateTime<chrono_tz::Tz>, chrono_tz::ParseError> {
-    let timezone: chrono_tz::Tz = tz_as_str.parse() ?;    
+pub(crate) fn get_current_date_from_tz(
+    tz_as_str: &str,
+) -> Result<chrono::DateTime<chrono_tz::Tz>, chrono_tz::ParseError> {
+    let timezone: chrono_tz::Tz = tz_as_str.parse()?;
     return Ok(chrono::Utc::now().with_timezone(&timezone));
 }
 
 pub(crate) fn split_date_time(date: &str, timezone: &str) -> (String, usize, String) {
     let mut date_iter = date.split_whitespace();
     let current_date_iso = date_iter.next().unwrap().trim().to_string();
-    let current_hour = date_iter.next().unwrap().split(":").next().unwrap().parse::<usize>().unwrap();
+    let current_hour = date_iter
+        .next()
+        .unwrap()
+        .split(":")
+        .next()
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
     let timezone_url_ready = timezone.replace("/", "%2F");
     (current_date_iso, current_hour, timezone_url_ready)
 }
