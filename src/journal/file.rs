@@ -48,13 +48,10 @@ mod tests {
     }
 
     #[test]
-    fn test_expand_file_path_invalid_tilde() {
-        let file_name = "~invalid/file.txt";
-        let expected_err = "Could not determine home directory";
-        assert_eq!(
-            format!("{}", expand_file_path(file_name).unwrap_err()),
-            expected_err
-        );
+    fn test_expand_file_path_dirname_with_tilde_prefix() {
+        let file_name = "~path/to/file.txt";
+        let expected_path = PathBuf::from("~path/to/file.txt");
+        assert_eq!(expand_file_path(file_name).unwrap(), expected_path);
     }
 
     #[test]
