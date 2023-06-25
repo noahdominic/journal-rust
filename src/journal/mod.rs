@@ -12,7 +12,7 @@ use clap::Parser;
 
 use crate::journal::args::JournalCommand;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub(crate) struct Location {
     name: String,
     latitude: f64,
@@ -117,12 +117,8 @@ pub fn journal_main_driver() -> Result<(), Box<dyn std::error::Error>> {
     let args = args::JournalArgs::parse();
     if let Some(command) = args.journal_command {
         match command {
-            JournalCommand::New => {
-                let (preamble, file_name) = drivers::journal_init_driver()?;
-                let file_path = file::expand_file_path(&file_name)?;
-                file::create_file(&file_path)?;
-                file::write_preamble(&file_path, &preamble)?;
-            }
+            JournalCommand::New => drivers::create_new_entry_driver(),
+            JournalCommand::Init => drivers::init_new_config_driver()?,
         }
     }
     Ok(())

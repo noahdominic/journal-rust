@@ -17,4 +17,6 @@ pub enum JournalCommand {
 
     // /// Prints a file to stdout. Default to today's entry.
     // Show,
+    /// Initialise the your journal
+    Init,
 }
