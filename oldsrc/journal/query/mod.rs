@@ -26,7 +26,7 @@ macro_rules! lnprint {
 /// or `std::io::Error` if an error occurred while reading the input.
 pub(crate) fn for_string(question: &str, hint: &str) -> Result<String, std::io::Error> {
     // Prompt the user with the question and hint.
-    lnprint!("{} ({}): ", question, hint);
+    lnprint!("{} [{}]: ", question, hint);
     std::io::stdout().flush()?;
 
     // Read the user's input from the standard input stream.
@@ -79,7 +79,7 @@ pub(crate) fn for_bool(question: &str) -> Result<bool, std::io::Error> {
 ///
 /// This function is dependent on `query_for_string()`.
 pub(crate) fn for_usize(question: &str) -> Result<usize, Box<dyn std::error::Error>> {
-    let user_response = for_string(question, "[index]")?;
+    let user_response = for_string(question, "1|2|3...")?;
     Ok(user_response.trim().parse::<usize>()?)
 }
 

@@ -10,9 +10,6 @@ pub struct JournalArgs {
 
 #[derive(Debug, Subcommand)]
 pub enum JournalCommand {
-    /// Initialise the your journal
-    Init,
-
     /// Creates a new journal entry for today
     New,
     // /// Open a file. Defaults to today's entry.
@@ -20,4 +17,7 @@ pub enum JournalCommand {
 
     // /// Prints a file to stdout. Default to today's entry.
     // Show,
+
+    /// Initialise the your journal
+    Init
 }

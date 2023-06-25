@@ -1,4 +1,4 @@
-const MESSAGE_GREETING_CONFIG_INIT: &str = "--Welcome to journal_CLI!--\n\
+const MESSAGE_GREETING_CONFIG_INIT: &str = "--Welcome to journal_CLI!--\n\n\
 This command-line interface app is here to help you document your thoughts,\n\
 experiences, and ideas effortlessly.  Let's get you started :) \n\n\
 \
@@ -13,7 +13,6 @@ for accurate timezone and weather data.";
 pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>> {
     println!("{}", MESSAGE_GREETING_CONFIG_INIT);
     println!();
-    println!();
     println!("{}", MESSAGE_LOCATION_EXPLAINER);
 
     // default_location_name and default_location are separate bc
@@ -22,11 +21,17 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     let (default_location_name, default_location) =
         crate::journal::query::user::ask_for_location()?;
 
+    println!();
+    println!("Here are the settings we've made for you:");
     println!("[defaults]");
     println!("location_full_name=\"{}\"", default_location_name);
     println!("location_latitude=\"{}\"", default_location.latitude);
     println!("location_longitude=\"{}\"", default_location.longitude);
     println!("timezone=\"{}\"", default_location.timezone);
+
+    let config_file_path = crate::journal::query::user::ask_for_config_file_path()?;
+    crate::journal::file::mkdir_p(config_file_path)?;
+
     Ok(())
 }
 
