@@ -22,18 +22,18 @@ pub(crate) fn ask_to_choose_location_from_list(
     api_results: &[crate::journal::Location],
 ) -> Result<&crate::journal::Location, Box<dyn std::error::Error>> {
     match api_results.len() {
-        0 => Err("There are no locations in the database with that name.".into()),
+        0 => Err(Box::new(std::io::Error::new(
+            std::io::ErrorKind::NotFound,
+            "There are no locations in the database with that name.",
+        ))),
         1 => Ok(&api_results[0]),
         _ => {
-            println!(
-                "There are multiple locations found with the name '{}'.  Which one is correct?",
-                api_results[0].name
-            );
+            println!("There are multiple locations found.  Which one is correct?");
             for (i, result) in api_results.iter().enumerate() {
                 println!("{}. {}", i + 1, result);
             }
             loop {
-                let choice: usize =
+                let choice =
                     crate::journal::query::for_usize("Enter the number of your correct location")?;
                 if choice > 0 && choice <= api_results.len() {
                     return Ok(&api_results[choice - 1]);
