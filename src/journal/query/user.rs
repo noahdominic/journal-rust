@@ -48,7 +48,11 @@ pub(crate) fn ask_to_choose_location_from_list(
 
 pub(crate) fn ask_for_config_file_path() -> Result<String, Box<dyn std::error::Error>> {
     let question = "Where do you want to put config.toml?";
-    let hint = "/home/test/journal/";
+    let home_dir = dirs::home_dir().ok_or(crate::journal::file::FileError::HomeDirNotFound)?;
+    let binding = home_dir.join("journal");
+    let hint = binding
+        .to_str()
+        .ok_or(crate::journal::file::FileError::HomeDirNotFound)?;
     let config_file_path = crate::journal::query::for_string(question, hint)?;
     Ok(config_file_path)
 }

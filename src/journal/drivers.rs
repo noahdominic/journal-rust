@@ -30,7 +30,32 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     println!("timezone=\"{}\"", default_location.timezone);
 
     let config_file_path = crate::journal::query::user::ask_for_config_file_path()?;
-    crate::journal::file::mkdir_p(config_file_path)?;
+    let config_file_pathbuf = crate::journal::file::mkdir_p(config_file_path)?;
+
+    let config_contents = format!(
+        "[defaults]\nlocation_full_name=\"{}\"\nlocation_latitude=\"{}\"\nlocation_longitude=\"{}\"\ntimezone=\"{}\"\n",
+        default_location_name,
+        default_location.latitude,
+        default_location.longitude,
+        default_location.timezone
+    );
+
+    let config_file_path = config_file_pathbuf.join("config.toml");
+
+    if std::path::Path::new(&config_file_path).exists() {
+        // Handle the case when the file already exists
+        // For example, you might choose to prompt the user for confirmation or take a different action
+        if !crate::journal::query::for_bool(&format!(
+            "A config.toml already exists in {}.  Overwrite?",
+            config_file_path.to_string_lossy()
+        ))? {
+            println!("Config init cancelled.");
+            return Ok(());
+        }
+    }
+
+    let mut file = std::fs::File::create(&config_file_path)?;
+    std::io::Write::write_all(&mut file, config_contents.as_bytes())?;
 
     Ok(())
 }
