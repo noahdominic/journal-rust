@@ -1,18 +1,23 @@
-const MESSAGE_GREETING_CONFIG_INIT: &str = "--Welcome to journal_CLI!--\n\n\
-This command-line interface app is here to help you document your thoughts,\n\
-experiences, and ideas effortlessly.  Let's get you started :) \n\n\
-\
-For this part, we'll set your defaults.";
+const MESSAGE_GREETING_CONFIG_INIT: &str = r#"
+--Welcome to journal_CLI!--
 
-const MESSAGE_LOCATION_EXPLAINER: &str = "Let's start with your default location.  \
-We use your default location to automatically detect your timezome and the weather.  \
-This will also be printed in your entries.  To ensure best results, make sure \
-that the last part of your location is somewhere that is specific enough \
-for accurate timezone and weather data.";
+This command-line interface app is here to help you document your thoughts,
+experiences, and ideas effortlessly.  Let's get you started :)
+
+For this part, we'll set your defaults.
+"#;
+
+const MESSAGE_LOCATION_EXPLAINER: &str = r#"
+Let's start with your default location.  
+
+We use your default location to automatically detect your timezome and 
+the weather.  This will also be printed in your entries.  To ensure the
+best results, make sure that the last part of your location is somewhere 
+that is specific enough for accurate timezone and weather data.
+"#;
 
 pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>> {
     println!("{}", MESSAGE_GREETING_CONFIG_INIT);
-    println!();
     println!("{}", MESSAGE_LOCATION_EXPLAINER);
 
     // default_location_name and default_location are separate bc
