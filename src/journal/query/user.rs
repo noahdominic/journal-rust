@@ -7,7 +7,7 @@ pub(crate) fn ask_for_location(
 
     // Getting location info via API below...
     let api_response_native =
-        crate::journal::query::api::for_location_info(&location_full_address)?;
+        crate::journal::query::api::get_location_info(&location_full_address)?;
 
     // Let user choose which location they want
     let city_info =

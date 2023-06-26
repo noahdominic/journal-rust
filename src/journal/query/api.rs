@@ -1,4 +1,4 @@
-pub(crate) fn for_location_info(
+pub(crate) fn get_location_info(
     full_location: &str,
 ) -> Result<Vec<crate::journal::Location>, Box<dyn std::error::Error>> {
     let city = full_location
