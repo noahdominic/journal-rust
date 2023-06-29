@@ -26,17 +26,6 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     let (default_location_name, default_location) =
         crate::journal::query::user::ask_for_location()?;
 
-    println!();
-    println!("Here are the settings we've made for you:");
-    println!("[defaults]");
-    println!("location_full_name=\"{}\"", default_location_name);
-    println!("location_latitude=\"{}\"", default_location.latitude);
-    println!("location_longitude=\"{}\"", default_location.longitude);
-    println!("timezone=\"{}\"", default_location.timezone);
-
-    let config_file_path = crate::journal::query::user::ask_for_config_file_path()?;
-    let config_file_pathbuf = crate::journal::file::mkdir_p(config_file_path)?;
-
     let config_contents = format!(
         "[defaults]\nlocation_full_name=\"{}\"\nlocation_latitude=\"{}\"\nlocation_longitude=\"{}\"\ntimezone=\"{}\"\n",
         default_location_name,
@@ -44,6 +33,12 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
         default_location.longitude,
         default_location.timezone
     );
+
+    println!();
+    println!("Here are the settings we've made for you: \n{}", config_defaults);
+
+    let config_file_path = crate::journal::query::user::ask_for_config_file_path()?;
+    let config_file_pathbuf = crate::journal::file::mkdir_p(config_file_path)?;
 
     let config_file_path = config_file_pathbuf.join("config.toml");
 
