@@ -41,3 +41,20 @@ pub(crate) fn expand_file_path(
 
     Ok(file_path)
 }
+
+pub(crate) fn is_config_file_exists(config_file_pathbuf: &std::path::PathBuf) -> Result<bool, std::io::Error> {
+    // When a config.toml exists...
+    if std::path::Path::new(&config_file_pathbuf).exists() {
+        // ...ask the user if they want to overwrite it then...
+        if !crate::journal::query::for_bool(&format!(
+            "A config.toml already exists in {}.  Overwrite?",
+            config_file_pathbuf.to_string_lossy()
+        ))? {
+            // ...cancel if they don't want to or...
+            println!("Config init cancelled.");
+            return Ok(false);
+        }
+        // ...proceed with writing, if they do.
+    }
+    Ok(true)
+}

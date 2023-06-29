@@ -1,4 +1,6 @@
 const MESSAGE_GREETING_CONFIG_INIT: &str = r#"
+
+
 --Welcome to journal_CLI!--
 
 This command-line interface app is here to help you document your thoughts,
@@ -21,13 +23,17 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     println!("{}", MESSAGE_LOCATION_EXPLAINER);
 
     // default_location_name and default_location are separate bc
-    // default_location_name IS user input
-    // but default_locaiton IS api information based on last substring of default_location_name
+    //      default_location_name IS user input
+    //      but default_locaiton IS api information based on last substring of default_location_name
     let (default_location_name, default_location) =
         crate::journal::query::user::ask_for_location()?;
 
     let config_contents = format!(
-        "[defaults]\nlocation_full_name=\"{}\"\nlocation_latitude=\"{}\"\nlocation_longitude=\"{}\"\ntimezone=\"{}\"\n",
+        "[defaults]\n\
+        location_full_name=\"{}\"\n\
+        location_latitude=\"{}\"\n\
+        location_longitude=\"{}\"\n\
+        timezone=\"{}\"\n",
         default_location_name,
         default_location.latitude,
         default_location.longitude,
@@ -35,30 +41,22 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     );
 
     println!();
-    println!("Here are the settings we've made for you: \n{}", config_defaults);
+    println!("Here are the settings we've made for you: \n{}", config_contents);
 
     // Ask user for path of config file
+    //      Prompt: Where do you want to put config.toml?
     let config_file_path = crate::journal::query::user::ask_for_config_file_path()?;
-    // If it doesn't exist, create the directories; get the PathBuf to it
+    // If it doesn't exist, create the directories; return the PathBuf of created/existing path
     let config_file_pathbuf = crate::journal::file::mkdir_p(config_file_path)?;
     // Add filename to that PathBuf
-    let config_file_path = config_file_pathbuf.join("config.toml");
-
-    // When a config.toml exists...
-    if std::path::Path::new(&config_file_path).exists() {
-        // ...ask the user if they want to overwrite it then...
-        if !crate::journal::query::for_bool(&format!(
-            "A config.toml already exists in {}.  Overwrite?",
-            config_file_path.to_string_lossy()
-        ))? {
-            // ...cancel if they don't want to or...
-            println!("Config init cancelled.");
-            return Ok(());
-        }
-        // ...proceed with writing, if they do.
+    let config_file_pathbuf = config_file_pathbuf.join("config.toml");
+    // Check for file if file already exists
+    let proceed_with_writing = crate::journal::file::is_config_file_exists(&config_file_pathbuf)?;
+    if !proceed_with_writing {
+        return Ok(());
     }
     
-    let mut file = std::fs::File::create(&config_file_path)?;
+    let mut file = std::fs::File::create(&config_file_pathbuf)?;
     std::io::Write::write_all(&mut file, config_contents.as_bytes())?;
 
     Ok(())
