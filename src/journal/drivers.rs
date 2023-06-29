@@ -41,7 +41,10 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     );
 
     println!();
-    println!("Here are the settings we've made for you: \n{}", config_contents);
+    println!(
+        "Here are the settings we've made for you: \n{}",
+        config_contents
+    );
 
     // Ask user for path of config file
     //      Prompt: Where do you want to put config.toml?
@@ -51,11 +54,11 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     // Add filename to that PathBuf
     let config_file_pathbuf = config_file_pathbuf.join("config.toml");
     // Check for file if file already exists
-    let proceed_with_writing = crate::journal::file::is_config_file_exists(&config_file_pathbuf)?;
+    let proceed_with_writing = crate::journal::file::handle_file_exists(&config_file_pathbuf)?;
     if !proceed_with_writing {
         return Ok(());
     }
-    
+
     let mut file = std::fs::File::create(&config_file_pathbuf)?;
     std::io::Write::write_all(&mut file, config_contents.as_bytes())?;
 

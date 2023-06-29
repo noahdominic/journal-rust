@@ -42,7 +42,9 @@ pub(crate) fn expand_file_path(
     Ok(file_path)
 }
 
-pub(crate) fn is_config_file_exists(config_file_pathbuf: &std::path::PathBuf) -> Result<bool, std::io::Error> {
+pub(crate) fn handle_file_exists(
+    config_file_pathbuf: &std::path::PathBuf,
+) -> Result<bool, std::io::Error> {
     // When a config.toml exists...
     if std::path::Path::new(&config_file_pathbuf).exists() {
         // ...ask the user if they want to overwrite it then...
