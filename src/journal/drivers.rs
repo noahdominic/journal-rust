@@ -37,23 +37,27 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     println!();
     println!("Here are the settings we've made for you: \n{}", config_defaults);
 
+    // Ask user for path of config file
     let config_file_path = crate::journal::query::user::ask_for_config_file_path()?;
+    // If it doesn't exist, create the directories; get the PathBuf to it
     let config_file_pathbuf = crate::journal::file::mkdir_p(config_file_path)?;
-
+    // Add filename to that PathBuf
     let config_file_path = config_file_pathbuf.join("config.toml");
 
+    // When a config.toml exists...
     if std::path::Path::new(&config_file_path).exists() {
-        // Handle the case when the file already exists
-        // For example, you might choose to prompt the user for confirmation or take a different action
+        // ...ask the user if they want to overwrite it then...
         if !crate::journal::query::for_bool(&format!(
             "A config.toml already exists in {}.  Overwrite?",
             config_file_path.to_string_lossy()
         ))? {
+            // ...cancel if they don't want to or...
             println!("Config init cancelled.");
             return Ok(());
         }
+        // ...proceed with writing, if they do.
     }
-
+    
     let mut file = std::fs::File::create(&config_file_path)?;
     std::io::Write::write_all(&mut file, config_contents.as_bytes())?;
 
