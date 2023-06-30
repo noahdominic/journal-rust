@@ -56,7 +56,7 @@ pub(crate) fn handle_file_exists(
             println!("Config init cancelled.");
             return Ok(false);
         }
-        // ...proceed with writing, if they do.
     }
+    // ...proceed with writing, if they do.
     Ok(true)
 }
