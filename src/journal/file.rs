@@ -65,3 +65,9 @@ pub(crate) fn handle_file_exists(
     // ...proceed with writing, if they do.
     Ok(true)
 }
+
+pub(crate) fn get_dotfile_path() -> Result<std::path::PathBuf, FileError> {
+    dirs::home_dir()
+        .ok_or(FileError::HomeDirNotFound)
+        .map(|home_path| home_path.join(".journal"))
+}

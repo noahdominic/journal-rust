@@ -67,6 +67,14 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     let mut file = std::fs::File::create(&config_file_pathbuf)?;
     std::io::Write::write_all(&mut file, config_contents.as_bytes())?;
 
+    // Write the path to config.toml to ~/.journal
+    let dotfile_pathbuf = crate::journal::file::get_dotfile_path()?;
+    let mut dotfile = std::fs::File::create(&dotfile_pathbuf)?;
+    std::io::Write::write_all(
+        &mut dotfile,
+        config_file_pathbuf.to_string_lossy().as_bytes(),
+    )?;
+
     Ok(())
 }
 
