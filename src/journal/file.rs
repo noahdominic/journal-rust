@@ -24,19 +24,24 @@ pub(crate) fn mkdir_p(
     Ok(path)
 }
 
-pub(crate) fn expand_file_path(
-    file_name: &str,
-) -> Result<std::path::PathBuf, Box<dyn std::error::Error>> {
+pub(crate) fn expand_file_path(file_name: &str) -> Result<std::path::PathBuf, FileError> {
     if file_name.is_empty() {
-        let home_path = dirs::home_dir().ok_or("Could not determine home directory")?;
-        return Ok(home_path.join("journal"));
+        return dirs::home_dir()
+            .ok_or(FileError::HomeDirNotFound)
+            .map(|home_path| home_path.join("journal"));
     }
 
     let file_path = std::path::Path::new(file_name).to_path_buf();
 
     if file_path.starts_with("~") {
-        let home_path = dirs::home_dir().ok_or("Could not determine home directory")?;
-        return Ok(home_path.join(file_path.strip_prefix("~")?));
+        return dirs::home_dir()
+            .ok_or(FileError::HomeDirNotFound)
+            .and_then(|home_path| {
+                file_path
+                    .strip_prefix("~")
+                    .map(|stripped_path| home_path.join(stripped_path))
+                    .map_err(|_| FileError::InvalidPath)
+            });
     }
 
     Ok(file_path)
