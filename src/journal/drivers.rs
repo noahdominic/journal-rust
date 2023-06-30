@@ -40,25 +40,30 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
         default_location.timezone
     );
 
-    println!();
     println!(
-        "Here are the settings we've made for you: \n{}",
+        "\nHere are the settings we've made for you: \n{}",
         config_contents
     );
 
     // Ask user for path of config file
     //      Prompt: Where do you want to put config.toml?
     let config_file_path = crate::journal::query::user::ask_for_config_file_path()?;
+
     // If it doesn't exist, create the directories; return the PathBuf of created/existing path
     let config_file_pathbuf = crate::journal::file::mkdir_p(config_file_path)?;
+
     // Add filename to that PathBuf
     let config_file_pathbuf = config_file_pathbuf.join("config.toml");
+
     // Check for file if file already exists
     let proceed_with_writing = crate::journal::file::handle_file_exists(&config_file_pathbuf)?;
+
     if !proceed_with_writing {
+        // Early return.  No file writing needed
         return Ok(());
     }
 
+    // Write the settings to the path
     let mut file = std::fs::File::create(&config_file_pathbuf)?;
     std::io::Write::write_all(&mut file, config_contents.as_bytes())?;
 
