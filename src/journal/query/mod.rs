@@ -90,7 +90,7 @@ pub(crate) fn for_usize(question: &str) -> Result<usize, Box<dyn std::error::Err
 /// # Arguments
 ///
 /// * `url` - A string slice representing the URL to call the API on.
-pub(crate) fn call_api(url: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+pub(crate) fn call_api(url: &str) -> Result<Vec<u8>, curl::Error> {
     let mut api_caller = Easy::new();
     api_caller.url(url)?;
     let mut api_response_bytes = Vec::new();
