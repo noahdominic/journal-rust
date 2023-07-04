@@ -1,3 +1,7 @@
+use toml;
+
+use crate::journal::file::FileError;
+
 const MESSAGE_GREETING_CONFIG_INIT: &str = r#"
 
 
@@ -10,12 +14,12 @@ For this part, we'll set your defaults.
 "#;
 
 const MESSAGE_LOCATION_EXPLAINER: &str = r#"
-Let's start with your default location.  
+We'll only need your usual location.  
 
-We use your default location to automatically detect your timezome and 
-the weather.  This will also be printed in your entries.  To ensure the
-best results, make sure that the last part of your location is somewhere 
-that is specific enough for accurate timezone and weather data.
+We use your default location to automatically detect your default timezome and 
+to detect the current weather.  This will also be printed in your entries.  
+To ensure the best results, make sure that the last part of your location is 
+somewhere that is specific enough for accurate timezone and weather data.
 "#;
 
 pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>> {
@@ -72,10 +76,28 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     let mut dotfile = std::fs::File::create(&dotfile_pathbuf)?;
     std::io::Write::write_all(
         &mut dotfile,
-        config_file_pathbuf.to_string_lossy().as_bytes(),
+        config_file_pathbuf
+            .parent()
+            .ok_or(FileError::HomeDirNotFound)?
+            .to_string_lossy()
+            .as_bytes(),
     )?;
 
     Ok(())
 }
 
-pub(crate) fn create_new_entry_driver() {}
+pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>> {
+    let base_dir = crate::journal::file::read_dotfile()?;
+    println!("Basedir: {}", base_dir.to_string_lossy());
+    let (location_full_name, location_latitude, location_longitude, timezone) =
+        crate::journal::file::read_configfile(base_dir)?;
+
+    // let sample_file_path = format!("{}/test-entry", base_dir);
+    // let sample_file_message = format!(
+    //     "This is a sample file. Here are the details for config.toml. You are in {} ({}, {}) in {}",
+    //     location_full_name, location_latitude, location_longitude, timezone
+    // );
+    // let mut sample_file = std::fs::File::create(sample_file_path)?;
+    // std::io::Write::write_all(&mut sample_file, sample_file_message.as_bytes())?;
+    Ok(())
+}

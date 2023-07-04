@@ -71,3 +71,14 @@ pub(crate) fn get_dotfile_path() -> Result<std::path::PathBuf, FileError> {
         .ok_or(FileError::HomeDirNotFound)
         .map(|home_path| home_path.join(".journal"))
 }
+
+pub(crate) fn read_dotfile() -> Result<std::path::PathBuf, Box<dyn std::error::Error>> {
+    let dotfile_path = get_dotfile_path()?;
+    let dotfile_content = std::fs::read_to_string(dotfile_path)?;
+    let base_dir = std::path::PathBuf::from(dotfile_content);
+    Ok(base_dir)
+}
+
+pub(crate) fn read_configfile(config_file_path: std::path::PathBuf) {
+    // TODO
+}

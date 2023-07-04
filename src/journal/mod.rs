@@ -117,9 +117,9 @@ pub fn journal_main_driver() -> Result<(), Box<dyn std::error::Error>> {
     let args = args::JournalArgs::parse();
     if let Some(command) = args.journal_command {
         match command {
-            JournalCommand::Init => drivers::init_new_config_driver()?,
+            JournalCommand::Init => drivers::init_new_config_driver(),
             JournalCommand::New => drivers::create_new_entry_driver(),
-        }
+        }?
     }
     Ok(())
 }
