@@ -1,3 +1,5 @@
+use serde::de::Error;
+
 #[derive(Debug)]
 pub(crate) enum FileError {
     HomeDirNotFound,
@@ -79,6 +81,42 @@ pub(crate) fn read_dotfile() -> Result<std::path::PathBuf, Box<dyn std::error::E
     Ok(base_dir)
 }
 
-pub(crate) fn read_configfile(config_file_path: std::path::PathBuf) {
-    // TODO
+pub(crate) fn read_configfile(
+    config_file_path: &std::path::PathBuf,
+) -> Result<(String, String, String, String), Box<dyn std::error::Error>> {
+    // Read file as string
+    let toml_content_as_string = std::fs::read_to_string(config_file_path.join("config.toml"))?;
+    // Deserialise string from toml
+    let toml_value: toml::Value = toml::from_str(&toml_content_as_string)?;
+
+    let defaults_table = toml_value
+        .get("defaults")
+        .ok_or(toml::de::Error::custom("Missing 'defaults' table"))?
+        .as_table()
+        .ok_or(toml::de::Error::custom("Invalid 'defaults' table"))?;
+
+    let location_full_name = get_string_value(defaults_table, "location_full_name")?;
+    let location_latitude = get_string_value(defaults_table, "location_latitude")?;
+    let location_longitude = get_string_value(defaults_table, "location_longitude")?;
+    let timezone = get_string_value(defaults_table, "timezone")?;
+
+    Ok((
+        location_full_name,
+        location_latitude,
+        location_longitude,
+        timezone,
+    ))
+}
+
+fn get_string_value(table: &toml::value::Table, key: &str) -> Result<String, toml::de::Error> {
+    match table.get(key) {
+        Some(value) => {
+            if let Some(str_value) = value.as_str() {
+                Ok(str_value.to_owned())
+            } else {
+                Err(toml::de::Error::custom(format!("Invalid '{}' field", key)))
+            }
+        }
+        None => Err(toml::de::Error::custom(format!("Missing '{}' field", key))),
+    }
 }

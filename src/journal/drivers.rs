@@ -88,16 +88,15 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
 
 pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>> {
     let base_dir = crate::journal::file::read_dotfile()?;
-    println!("Basedir: {}", base_dir.to_string_lossy());
     let (location_full_name, location_latitude, location_longitude, timezone) =
-        crate::journal::file::read_configfile(base_dir)?;
+        crate::journal::file::read_configfile(&base_dir)?;
 
-    // let sample_file_path = format!("{}/test-entry", base_dir);
-    // let sample_file_message = format!(
-    //     "This is a sample file. Here are the details for config.toml. You are in {} ({}, {}) in {}",
-    //     location_full_name, location_latitude, location_longitude, timezone
-    // );
-    // let mut sample_file = std::fs::File::create(sample_file_path)?;
-    // std::io::Write::write_all(&mut sample_file, sample_file_message.as_bytes())?;
+    let sample_file_path = format!("{}/test-entry", base_dir.to_string_lossy());
+    let sample_file_message = format!(
+        "This is a sample file. Here are the details for config.toml. You are in {} ({}, {}) in {}.\n",
+        location_full_name, location_latitude, location_longitude, timezone
+    );
+    let mut sample_file = std::fs::File::create(sample_file_path)?;
+    std::io::Write::write_all(&mut sample_file, sample_file_message.as_bytes())?;
     Ok(())
 }
