@@ -1,9 +1,6 @@
-use toml;
-
 use crate::journal::file::FileError;
 
 const MESSAGE_GREETING_CONFIG_INIT: &str = r#"
-
 
 --Welcome to journal_CLI!--
 
@@ -20,6 +17,20 @@ We use your default location to automatically detect your default timezome and
 to detect the current weather.  This will also be printed in your entries.  
 To ensure the best results, make sure that the last part of your location is 
 somewhere that is specific enough for accurate timezone and weather data.
+
+Don't worry---if your city has the same name as a city elsewhere,
+like Los Angeles, Los Santos or San Francisco, Cebu,
+you would be asked to pick which city you meant.
+
+Example:
+- Avenida 9 SO - Carchi, Guiyaquil
+- Lor Marzuki, Singapore City
+- Café What?, Moshoeshoe Rd, Maseru
+"#;
+
+const MESSAGE_TEXTEDITORS_EXPLAINER: &str = r#"
+This application does not use its own text editors and will separately run 
+a text editor of your own choosing, like vim, nano, and emacs.
 "#;
 
 pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>> {
@@ -31,6 +42,10 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     //      but default_locaiton IS api information based on last substring of default_location_name
     let (default_location_name, default_location) =
         crate::journal::query::user::ask_for_location()?;
+
+    println!("{}", MESSAGE_TEXTEDITORS_EXPLAINER);
+
+    // TODO ask for text editor here
 
     let config_contents = format!(
         "[defaults]\n\
@@ -87,6 +102,8 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
 }
 
 pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>> {
+    // TODO  Check if journal has been init'd
+    // * File writing has been checked and is working.  Proceed to actual writing.
     let base_dir = crate::journal::file::read_dotfile()?;
     let (location_full_name, location_latitude, location_longitude, timezone) =
         crate::journal::file::read_configfile(&base_dir)?;
