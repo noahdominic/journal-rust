@@ -1,3 +1,6 @@
+#[derive(Debug)]
+struct UnexpectedChoiceError;
+
 pub(crate) fn ask_for_location(
 ) -> Result<(String, crate::journal::Location), Box<dyn std::error::Error>> {
     let location_full_address: String = crate::journal::query::for_string(
@@ -55,4 +58,40 @@ pub(crate) fn ask_for_config_file_path() -> Result<String, Box<dyn std::error::E
         .ok_or(crate::journal::file::FileError::HomeDirNotFound)?;
     let config_file_path = crate::journal::query::for_string(question, hint)?;
     Ok(config_file_path)
+}
+
+pub(crate) fn ask_for_text_editor_multchoice() -> Result<String, Box<dyn std::error::Error>> {
+    let choice = crate::journal::query::for_usize(
+        r#"Which text editor would you like to use?
+    1. Vim
+    2. Emacs
+    3. Nano
+    4. Pico
+    5. Other..."#,
+    )?;
+
+    let command = match choice {
+        1 => "vim".to_string(),
+        2 => "emacs".to_string(),
+        3 => "nano".to_string(),
+        4 => "pico".to_string(),
+        5 => ask_for_text_editor_input()?,
+        _ => {
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::Unsupported,
+                "Uh oh!  Something happened that shouldn't have happened.",
+            )));
+        }
+    };
+
+    Ok(command)
+}
+
+fn ask_for_text_editor_input() -> Result<String, Box<dyn std::error::Error>> {
+    let command = crate::journal::query::for_string(
+        "What command would you use to call your favourite text editor?",
+        "vim | nano | pico | ...",
+    )?;
+
+    Ok(command)
 }

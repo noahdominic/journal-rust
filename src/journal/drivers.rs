@@ -45,18 +45,20 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
 
     println!("{}", MESSAGE_TEXTEDITORS_EXPLAINER);
 
-    // TODO ask for text editor here
+    let editor = crate::journal::query::user::ask_for_text_editor_multchoice()?;
 
     let config_contents = format!(
         "[defaults]\n\
         location_full_name=\"{}\"\n\
         location_latitude=\"{}\"\n\
         location_longitude=\"{}\"\n\
-        timezone=\"{}\"\n",
+        timezone=\"{}\"\n\
+        editor=\"{}\"\n",
         default_location_name,
         default_location.latitude,
         default_location.longitude,
-        default_location.timezone
+        default_location.timezone,
+        editor
     );
 
     println!(
