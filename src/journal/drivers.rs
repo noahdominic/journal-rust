@@ -104,8 +104,12 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
 }
 
 pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>> {
-    // TODO  Check if journal has been init'd
-    // * File writing has been checked and is working.  Proceed to actual writing.
+    if !crate::journal::file::is_dotfile_exists()? {
+        println!(
+            "Ooops!  Looks like you haven't initialised your journal yet.  Try running `journal init` first."
+        );
+        return Ok(());
+    }
     let base_dir = crate::journal::file::read_dotfile()?;
     let (location_full_name, location_latitude, location_longitude, timezone) =
         crate::journal::file::read_configfile(&base_dir)?;

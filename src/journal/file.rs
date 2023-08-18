@@ -68,6 +68,10 @@ pub(crate) fn handle_file_exists(
     Ok(true)
 }
 
+pub(crate) fn is_dotfile_exists() -> Result<bool, FileError> {
+    Ok(get_dotfile_path()?.exists())
+}
+
 pub(crate) fn get_dotfile_path() -> Result<std::path::PathBuf, FileError> {
     dirs::home_dir()
         .ok_or(FileError::HomeDirNotFound)
