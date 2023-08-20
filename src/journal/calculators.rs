@@ -96,3 +96,54 @@ pub(crate) fn get_current_date_from_tz_as_str(
     let timezone: chrono_tz::Tz = tz_as_str.parse()?;
     return Ok(chrono::Utc::now().with_timezone(&timezone));
 }
+
+/**
+ * Splits a combined date and time string and prepares a URL-ready timezone string.
+ *
+ * This function takes a `date` and a `timezone` as input, and splits the combined date and time string
+ * to extract the ISO-formatted date and the hour. It also prepares the `timezone` string to be URL-ready
+ * by replacing slashes with "%2F". The function returns a tuple containing the extracted date, hour,
+ * and the URL-ready timezone string.
+ *
+ * # Arguments
+ *
+ * - `date`: A string representing the combined date and time.
+ * - `timezone`: A string representing the timezone.
+ *
+ * # Returns
+ *
+ * - `(String, usize, String)`: A tuple containing the extracted date as a string, the extracted hour as a usize,
+ *   and the URL-ready timezone string.
+ *
+ * # Example
+ *
+ * ```no_run
+ * fn main() {
+ *     let date = "2023-08-21 13:45:00";
+ *     let timezone = "America/New_York";
+ *     let (extracted_date, extracted_hour, url_ready_timezone) = split_date_time(date, timezone);
+ *     println!("Extracted Date: {}", extracted_date);
+ *     println!("Extracted Hour: {}", extracted_hour);
+ *     println!("URL-Ready Timezone: {}", url_ready_timezone);
+ * }
+ * ```
+ */
+pub(crate) fn preprocess_datetime_for_url(date: &str, timezone: &str) -> (String, usize, String) {
+    // Split the combined date and time string
+    let mut date_iter = date.split_whitespace();
+    let current_date_iso = date_iter.next().unwrap().trim().to_string();
+    let current_hour = date_iter
+        .next()
+        .unwrap()
+        .split(":")
+        .next()
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
+
+    // Prepare the timezone string for URLs
+    let timezone_url_ready = timezone.replace("/", "%2F");
+
+    // Return the extracted date, hour, and URL-ready timezone
+    (current_date_iso, current_hour, timezone_url_ready)
+}
