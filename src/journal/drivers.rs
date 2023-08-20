@@ -28,7 +28,7 @@ Example:
 - Café What?, Moshoeshoe Rd, Maseru
 "#;
 
-const MESSAGE_TEXTEDITORS_EXPLAINER: &str = r#"
+const MESSAGE_EDITORS_EXPLAINER: &str = r#"
 This application does not use its own text editors and will separately run 
 a text editor of your own choosing, like vim, nano, and emacs.
 "#;
@@ -39,11 +39,11 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
 
     // default_location_name and default_location are separate bc
     //      default_location_name IS user input
-    //      but default_locaiton IS api information based on last substring of default_location_name
+    //      but default_location IS api information based on last substring of default_location_name
     let (default_location_name, default_location) =
         crate::journal::query::user::ask_for_location()?;
 
-    println!("{}", MESSAGE_TEXTEDITORS_EXPLAINER);
+    println!("{}", MESSAGE_EDITORS_EXPLAINER);
 
     let editor = crate::journal::query::user::ask_for_text_editor_multchoice()?;
 
