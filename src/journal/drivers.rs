@@ -197,7 +197,7 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
     );
 
     // The line that writes var file_message into the file.
-    std::io::Write::write_all(&mut sample_file, sample_file_message.as_bytes())?;
+    std::io::Write::write_all(&mut sample_file, output_str.as_bytes())?;
 
     Ok(())
 }
