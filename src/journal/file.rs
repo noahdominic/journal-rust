@@ -1,5 +1,28 @@
 use serde::de::Error;
 
+/**
+ * Represents custom errors related to file operations.
+ *
+ * This enum defines custom error types for file-related operations.
+ *
+ * # Variants
+ *
+ * - `HomeDirNotFound`: Indicates that the user's home directory could not be found.
+ * - `InvalidPath`: Indicates that the provided path is invalid.
+ *
+ * # Example
+ *
+ * ```no_run
+ * fn main() -> Result<(), FileError> {
+ *     let result: Result<(), FileError> = Err(FileError::HomeDirNotFound);
+ *     match result {
+ *         Ok(_) => println!("Operation successful"),
+ *         Err(err) => println!("Error: {}", err),
+ *     }
+ *     Ok(())
+ * }
+ * ```
+ */
 #[derive(Debug)]
 pub(crate) enum FileError {
     HomeDirNotFound,
