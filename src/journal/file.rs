@@ -87,7 +87,7 @@ pub(crate) fn read_dotfile() -> Result<std::path::PathBuf, Box<dyn std::error::E
 
 pub(crate) fn read_configfile(
     config_file_path: &std::path::PathBuf,
-) -> Result<(String, String, String, String), Box<dyn std::error::Error>> {
+) -> Result<(String, String, String, String, String), Box<dyn std::error::Error>> {
     // Read file as string
     let toml_content_as_string = std::fs::read_to_string(config_file_path.join("config.toml"))?;
     // Deserialise string from toml
@@ -103,12 +103,14 @@ pub(crate) fn read_configfile(
     let location_latitude = get_string_value(defaults_table, "location_latitude")?;
     let location_longitude = get_string_value(defaults_table, "location_longitude")?;
     let timezone = get_string_value(defaults_table, "timezone")?;
+    let editor = get_string_value(defaults_table, "editor")?;
 
     Ok((
         location_full_name,
         location_latitude,
         location_longitude,
         timezone,
+        editor,
     ))
 }
 
