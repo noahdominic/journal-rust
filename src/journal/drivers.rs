@@ -104,20 +104,26 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
 }
 
 pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>> {
+    // Check if the dotfile (Always ~/.journal) exists.
+    // If it doesn't it execs an early return of Ok(())
     if !crate::journal::file::is_dotfile_exists()? {
         println!(
-            "Ooops!  Looks like you haven't initialised your journal yet.  Try running `journal init` first."
+            "Oops!  Looks like you haven't initialised your journal yet.  Try running `journal init` first."
         );
         return Ok(());
     }
+
+    // This will read the contents of the dotfile, which is the path of the config file, which is set by the user in the init
     let base_dir = crate::journal::file::read_dotfile()?;
-    let (location_full_name, location_latitude, location_longitude, timezone) =
+
+    // Retrieve details
+    let (location_full_name, location_latitude, location_longitude, timezone, editor ) =
         crate::journal::file::read_configfile(&base_dir)?;
 
     let sample_file_path = format!("{}/test-entry", base_dir.to_string_lossy());
     let sample_file_message = format!(
-        "This is a sample file. Here are the details for config.toml. You are in {} ({}, {}) in {}.\n",
-        location_full_name, location_latitude, location_longitude, timezone
+        "This is a sample file. Here are the details for config.toml. You are in {} ({}, {}) in {}, and you want to use {}.\n",
+        location_full_name, location_latitude, location_longitude, timezone, editor
     );
     let mut sample_file = std::fs::File::create(sample_file_path)?;
     std::io::Write::write_all(&mut sample_file, sample_file_message.as_bytes())?;
