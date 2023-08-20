@@ -122,13 +122,79 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
 
     // Create the file here
     let sample_file_path = crate::journal::calculators::get_path_to_todays_entry(base_dir)?;
-    let sample_file_message = format!(
-        "This is a sample file. Here are the details for config.toml. You are in {} ({}, {}) in {}, and you want to use {}.\n",
-        location_full_name, location_latitude, location_longitude, timezone, editor
-    );
     let mut sample_file = std::fs::File::create(sample_file_path)?;
 
-    // TODO Generate journal entry preambles
+    let current_date = crate::journal::calculators::get_current_date_from_tz_as_str(&timezone)?;
+
+    // Use info from config file to query weather from OpenMeteo API
+    let current_weather = crate::journal::query::api::for_weather_info(
+        &(current_date
+            .format("%Y-%m-%d %H:%M").to_string()),
+        &location_latitude,
+        &location_longitude,
+        &timezone,
+    )?;
+
+    let weather_map = std::collections::HashMap::from([
+        (0, "Clear skies"),
+        (1, "Mainly clear skies"),
+        (2, "Partly cloudy skies"),
+        (3, "Overcast skies"),
+        (45, "Fog"),
+        (48, "Fog"),
+        (51, "Light drizzle"),
+        (53, "Moderate drizzle"),
+        (55, "Heavy drizzle"),
+        (56, "Light drizzle, freezing"),
+        (57, "Moderate or heavy drizzle, freezing"),
+        (61, "Light rain"),
+        (63, "Moderate rain"),
+        (65, "Heavy rain"),
+        (66, "Light rain, freezing"),
+        (67, "Moderate or heavy rain, freezing"),
+        (71, "Snow fall: Slight intensity"),
+        (73, "Snow fall: Moderate intensity"),
+        (75, "Snow fall: Heavy intensity"),
+        (77, "Snow grains"),
+        (80, "Light rain showers"),
+        (81, "Moderate rain showers"),
+        (82, "Violent rainshowers"),
+        (85, "Snow showers: Slight intensity"),
+        (86, "Snow showers: Heavy intensity"),
+        (95, "Thunderstorm: Slight or moderate"),
+        (96, "Thunderstorm with slight hail"),
+        (99, "Thunderstorm with heavy hail"),
+    ]);
+
+    let output_str = format!(
+        "DATE: {}\n\
+        LOCATION: {}\n\
+        \n\
+        Temperature: {} C, feels like {} C, {}.\n\
+        UV Index: {}  Sunrise: {}   Sunset: {}\n\
+        Rain: {} mm\n\
+        Winds: {} km/h {}\n\
+        Pressure: {} hPa\n\
+        Humidity: {}%\n\
+        Visibility: {} km\n\
+        ",
+        current_date.format("%a, %Y %b %d %H:%M:%S %Z (%:z)"),
+        location_full_name,
+        current_weather.temperature,
+        current_weather.apparent_temperature,
+        weather_map
+            .get(&current_weather.weather_code)
+            .unwrap_or(&"Unknown conditions"),
+        current_weather.uv_index,
+        current_weather.sunrise,
+        current_weather.sunset,
+        current_weather.rain,
+        current_weather.windspeed,
+        crate::journal::calculators::get_direction(current_weather.winddirection),
+        current_weather.pressure,
+        current_weather.humidity,
+        current_weather.visibility / 1000.0
+    );
 
     // The line that writes var file_message into the file.
     std::io::Write::write_all(&mut sample_file, sample_file_message.as_bytes())?;
