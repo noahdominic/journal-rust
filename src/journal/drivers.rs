@@ -121,12 +121,14 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
         crate::journal::file::read_configfile(&base_dir)?;
 
     // Create the file here
-    let sample_file_path = format!("{}/test-entry", base_dir.to_string_lossy());
+    let sample_file_path = crate::journal::calculators::get_path_to_todays_entry(base_dir)?;
     let sample_file_message = format!(
         "This is a sample file. Here are the details for config.toml. You are in {} ({}, {}) in {}, and you want to use {}.\n",
         location_full_name, location_latitude, location_longitude, timezone, editor
     );
     let mut sample_file = std::fs::File::create(sample_file_path)?;
+
+    // TODO Generate journal entry preambles
 
     // The line that writes var file_message into the file.
     std::io::Write::write_all(&mut sample_file, sample_file_message.as_bytes())?;
