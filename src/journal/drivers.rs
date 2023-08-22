@@ -218,3 +218,14 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
 
     Ok(())
 }
+
+fn is_journal_initialised_driver() -> Result<bool, FileError> {
+    if !crate::journal::file::is_dotfile_exists()? {
+        println!(
+            "Oops!  Looks like you haven't initialised your journal yet.  Try running `journal init` first."
+        );
+        return Ok(false);
+    }
+
+    return Ok(true);
+}
