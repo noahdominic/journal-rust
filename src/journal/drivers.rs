@@ -105,7 +105,6 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
 
 pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>> {
     // Check if the journal is initialised
-    // If it doesn't it execs an early return of Ok(())
     if !is_journal_initialised_driver()? {
         return Ok(());
     }
