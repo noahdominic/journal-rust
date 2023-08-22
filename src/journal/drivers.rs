@@ -114,20 +114,20 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
     }
 
     // This will read the contents of the dotfile, which is the path of the config file, which is set by the user in the init
-    let base_dir = crate::journal::file::read_dotfile()?;
+    let journal_dir = crate::journal::file::read_dotfile()?;
 
     // Retrieve details from config file
     let (location_full_name, location_latitude, location_longitude, timezone, editor ) =
-        crate::journal::file::read_configfile(&base_dir)?;
+        crate::journal::file::read_configfile(&journal_dir)?;
 
     // Create the file here
-    let sample_file_path = crate::journal::calculators::get_path_to_todays_entry(base_dir)?;
+    let filepath_for_todays_entry = crate::journal::calculators::get_path_to_todays_entry(journal_dir)?;
 
     let mut file_for_todays_entry = std::fs::OpenOptions::new()
         .create(true)
         .write(true)
         .append(true)
-        .open(&sample_file_path)?;
+        .open(&filepath_for_todays_entry)?;
 
     let current_date = crate::journal::calculators::get_current_date_from_tz_as_str(&timezone)?;
 
@@ -206,7 +206,7 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
 
     // Calls the user's editor command, as deserialised from the config file
     let status = std::process::Command::new(&editor)
-        .arg(&sample_file_path)
+        .arg(&filepath_for_todays_entry)
         .status()?;
 
     // ? This is a dev print, but should we keep this?
