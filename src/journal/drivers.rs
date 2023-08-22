@@ -223,9 +223,6 @@ pub(crate) fn open_todays_entry_driver() ->  Result<(), Box<dyn std::error::Erro
     // Check if the journal is initialised
     // If it doesn't it execs an early return of Ok(())
     if is_journal_initialised_driver()? {
-        println!(
-            "Oops!  Looks like you haven't initialised your journal yet.  Try running `journal init` first."
-        );
         return Ok(());
     }
 
