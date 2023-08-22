@@ -134,6 +134,10 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
     // Create the file here
     let filepath_for_todays_entry = crate::journal::calculators::get_path_to_todays_entry(journal_dir)?;
 
+    let filepath_for_dir =  std::path::Path::new(&filepath_for_todays_entry).parent().expect("Error in extracting parent of today's entry").to_str().expect("Error in converting Path to str");
+
+    std::fs::create_dir_all(filepath_for_dir)?;
+
     let mut file_for_todays_entry = std::fs::OpenOptions::new()
         .create(true)
         .write(true)
