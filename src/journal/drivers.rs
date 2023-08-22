@@ -199,5 +199,15 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
     // The line that writes var file_message into the file.
     std::io::Write::write_all(&mut sample_file, output_str.as_bytes())?;
 
+    let status = std::process::Command::new(&editor)
+        .arg(&sample_file_path)
+        .status()?;
+
+    if status.success() {
+        println!("File opened in {}", editor);
+    } else {
+        eprintln!("Failed to open file in {}", editor);
+    }
+
     Ok(())
 }
