@@ -122,7 +122,12 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
 
     // Create the file here
     let sample_file_path = crate::journal::calculators::get_path_to_todays_entry(base_dir)?;
-    let mut sample_file = std::fs::File::create(sample_file_path)?;
+
+    let mut sample_file = std::fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .append(true)
+        .open(&sample_file_path)?;
 
     let current_date = crate::journal::calculators::get_current_date_from_tz_as_str(&timezone)?;
 
