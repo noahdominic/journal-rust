@@ -1,8 +1,8 @@
 pub(crate) mod api;
 pub(crate) mod user;
 
-use std::io::Write;
 use curl::easy::Easy;
+use std::io::Write;
 
 /// Prints a string in with blank line paddings
 macro_rules! lnprint {
@@ -28,7 +28,7 @@ pub(crate) fn for_string(question: &str, hint: &str) -> Result<String, std::io::
     // Prompt the user with the question and hint.
     lnprint!("{} [{}]: ", question, hint);
     std::io::stdout().flush()?;
-    
+
     // Read the user's input from the standard input stream.
     let mut user_response = String::new();
     std::io::stdin().read_line(&mut user_response)?;
@@ -51,7 +51,7 @@ pub(crate) fn for_string(question: &str, hint: &str) -> Result<String, std::io::
 /// or `std::io::Error` if an error occurred while reading the input.
 ///
 /// # Note
-/// 
+///
 /// This function is dependent on `query_for_string()`.
 pub(crate) fn for_bool(question: &str) -> Result<bool, std::io::Error> {
     // This is very condensed so here's a more readable summary:
@@ -76,7 +76,7 @@ pub(crate) fn for_bool(question: &str) -> Result<bool, std::io::Error> {
 /// or `std::num::ParseIntError` if the input could not be parsed as a `usize`.
 ///
 /// # Note
-/// 
+///
 /// This function is dependent on `query_for_string()`.
 pub(crate) fn for_usize(question: &str) -> Result<usize, Box<dyn std::error::Error>> {
     let user_response = for_string(question, "1|2|3...")?;
@@ -96,7 +96,7 @@ pub(crate) fn call_api(url: &str) -> Result<Vec<u8>, Box<dyn std::error::Error>>
     let mut api_response_bytes = Vec::new();
     {
         let mut transfer = api_caller.transfer();
-        transfer.write_function( |received_data| {
+        transfer.write_function(|received_data| {
             api_response_bytes.extend_from_slice(received_data);
             Ok(received_data.len())
         })?;
