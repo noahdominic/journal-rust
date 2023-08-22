@@ -204,10 +204,12 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
     // The line that writes var file_message into the file.
     std::io::Write::write_all(&mut sample_file, output_str.as_bytes())?;
 
+    // Calls the user's editor command, as deserialised from the config file
     let status = std::process::Command::new(&editor)
         .arg(&sample_file_path)
         .status()?;
 
+    // ? This is a dev print, but should we keep this?
     if status.success() {
         println!("File opened in {}", editor);
     } else {
