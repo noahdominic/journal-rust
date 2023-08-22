@@ -123,7 +123,7 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
     // Create the file here
     let sample_file_path = crate::journal::calculators::get_path_to_todays_entry(base_dir)?;
 
-    let mut sample_file = std::fs::OpenOptions::new()
+    let mut file_for_todays_entry = std::fs::OpenOptions::new()
         .create(true)
         .write(true)
         .append(true)
@@ -171,7 +171,7 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
         (99, "Thunderstorm with heavy hail"),
     ]);
 
-    let output_str = format!(
+    let preamble_str = format!(
         "DATE: {}\n\
         LOCATION: {}\n\
         \n\
@@ -202,7 +202,7 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
     );
 
     // The line that writes var file_message into the file.
-    std::io::Write::write_all(&mut sample_file, output_str.as_bytes())?;
+    std::io::Write::write_all(&mut file_for_todays_entry, preamble_str.as_bytes())?;
 
     // Calls the user's editor command, as deserialised from the config file
     let status = std::process::Command::new(&editor)
