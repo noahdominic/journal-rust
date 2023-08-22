@@ -15,8 +15,9 @@ pub enum JournalCommand {
 
     /// Creates a new journal entry for today
     New,
-    // /// Open a file. Defaults to today's entry.
-    // Open,
+
+    /// Open a file. Defaults to today's entry.
+    Open,
 
     // /// Prints a file to stdout. Default to today's entry.
     // Show,

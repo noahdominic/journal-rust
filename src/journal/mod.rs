@@ -119,6 +119,7 @@ pub fn journal_main_driver() -> Result<(), Box<dyn std::error::Error>> {
         match command {
             JournalCommand::Init => drivers::init_new_config_driver(),
             JournalCommand::New => drivers::create_new_entry_driver(),
+            JournalCommand::Open => drivers::open_todays_entry_driver(),
         }?
     }
     Ok(())
