@@ -104,15 +104,11 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
 }
 
 pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>> {
-    // Check if the dotfile (Always ~/.journal) exists.
+    // Check if the journal is initialised
     // If it doesn't it execs an early return of Ok(())
-    if !crate::journal::file::is_dotfile_exists()? {
-        println!(
-            "Oops!  Looks like you haven't initialised your journal yet.  Try running `journal init` first."
-        );
+    if is_journal_initialised_driver()? {
         return Ok(());
     }
-
     // This will read the contents of the dotfile, which is the path of the config file, which is set by the user in the init
     let journal_dir = crate::journal::file::read_dotfile()?;
 
@@ -257,8 +253,8 @@ fn is_journal_initialised_driver() -> Result<bool, FileError> {
         println!(
             "Oops!  Looks like you haven't initialised your journal yet.  Try running `journal init` first."
         );
-        return Ok(false);
+        return Ok(true);
     }
 
-    return Ok(true);
+    return Ok(false);
 }
