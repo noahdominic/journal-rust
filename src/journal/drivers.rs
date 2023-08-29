@@ -121,7 +121,7 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
 
 pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>> {
     // Check if the journal is initialised
-    if !is_journal_initialised_driver()? {
+    if !is_journal_initialised_checker()? {
         return Ok(());
     }
     // This will read the contents of the dotfile, which is the path of the config file, which is set by the user in the init
@@ -267,7 +267,7 @@ pub(crate) fn open_todays_entry_driver() ->  Result<(), Box<dyn std::error::Erro
 }
 
 
-fn is_journal_initialised_driver() -> Result<bool, FileError> {
+fn is_journal_initialised_checker() -> Result<bool, FileError> {
     // Is it true that the file does NOT exist?
     // i.e. If the file exists, do not run what is inside then return true.
     if !crate::journal::file::is_dotfile_exists()? {
