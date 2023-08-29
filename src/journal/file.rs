@@ -197,7 +197,7 @@ pub(crate) fn expand_file_path(file_name: &str) -> Result<std::path::PathBuf, Fi
  * }
  * ```
  */
-pub(crate) fn handle_file_exists(
+pub(crate) fn is_proceed_with_writing(
     config_file_pathbuf: &std::path::PathBuf,
 ) -> Result<bool, std::io::Error> {
     // Check if the configuration file already exists
@@ -305,7 +305,7 @@ pub(crate) fn get_dotfile_path() -> Result<std::path::PathBuf, FileError> {
  * }
  * ```
  */
-pub(crate) fn read_dotfile() -> Result<std::path::PathBuf, Box<dyn std::error::Error>> {
+pub(crate) fn get_base_dir() -> Result<std::path::PathBuf, Box<dyn std::error::Error>> {
     // Get the path to the dotfile
     let dotfile_path = get_dotfile_path()?;
 
@@ -352,9 +352,9 @@ pub(crate) fn read_dotfile() -> Result<std::path::PathBuf, Box<dyn std::error::E
  * }
  * ```
  */
-pub(crate) fn read_configfile(
-    config_file_path: &std::path::PathBuf,
-) -> Result<(String, String, String, String, String), Box<dyn std::error::Error>> {
+pub(crate) fn get_config_details() -> Result<(String, String, String, String, String), Box<dyn std::error::Error>> {
+    let config_file_path = get_base_dir()?;
+
     // Read the TOML content from the config file as a string
     let toml_content_as_string = std::fs::read_to_string(config_file_path.join("config.toml"))?;
 
@@ -383,6 +383,11 @@ pub(crate) fn read_configfile(
         timezone,
         editor,
     ))
+}
+
+pub(crate) fn get_temp_file_path() -> Result<std::path::PathBuf, Box<dyn std::error::Error>>{
+    let config_file_path = get_base_dir()?;
+    Ok(config_file_path.join(".temp_file"))
 }
 
 

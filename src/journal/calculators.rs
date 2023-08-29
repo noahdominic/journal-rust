@@ -44,15 +44,19 @@
  * }
  * ```
  */
-pub(crate) fn get_path_to_todays_entry(base_dir: std::path::PathBuf) -> Result<String, Box<dyn std::error::Error>> {
+pub(crate) fn get_path_to_todays_entry() -> Result<String, Box<dyn std::error::Error>> {
+    let base_dir = crate::journal::file::get_base_dir()?;
+
+    let (_, _, _, timezone, _) = crate::journal::file::get_config_details()?;
+
     // Get the current date
-    let current_date = chrono::Local::now().date_naive();
+    let current_date = get_current_date_from_tz_as_str(&timezone)?;
 
     // Create the path to today's entry
     let today_entry_path = format!(
         "{}/{}",
         base_dir.to_string_lossy(),
-        current_date.format("%Y/%m/%d")
+        current_date.format("%Y/%m/%d.%H-%M.txt")
     );
 
     // Return the path as a String
