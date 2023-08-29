@@ -14,7 +14,7 @@
  * along with this program. If not, see <https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12>.
  */
 
-pub(crate) mod api;
+pub(crate) mod open_meteo;
 pub(crate) mod user;
 
 use curl::easy::Easy;
