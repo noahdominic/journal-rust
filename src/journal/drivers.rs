@@ -235,33 +235,33 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
 }
 
 pub(crate) fn open_todays_entry_driver() ->  Result<(), Box<dyn std::error::Error>> {
-    // Check if the journal is initialised
-    // If it doesn't it execs an early return of Ok(())
-    if !is_journal_initialised_driver()? {
-        return Ok(());
-    }
-
-    // This will read the contents of the dotfile, which is the path of the config file, which is set by the user in the init
-    let journal_dir = crate::journal::file::read_dotfile()?;
-
-    // Retrieve details from config file
-    let (_, _, _, _, editor ) =
-        crate::journal::file::read_configfile(&journal_dir)?;
-
-    // Create the file here
-    let filepath_for_todays_entry = crate::journal::calculators::get_path_to_todays_entry(journal_dir)?;
-
-    // Calls the user's editor command, as deserialised from the config file
-    let status = std::process::Command::new(&editor)
-        .arg(&filepath_for_todays_entry)
-        .status()?;
-
-    // ? This is a dev print, but should we keep this?
-    if status.success() {
-        println!("File opened in {}", editor);
-    } else {
-        eprintln!("Failed to open file in {}", editor);
-    }
+    // // Check if the journal is initialised
+    // // If it doesn't it execs an early return of Ok(())
+    // if !is_journal_initialised_driver()? {
+    //     return Ok(());
+    // }
+    //
+    // // This will read the contents of the dotfile, which is the path of the config file, which is set by the user in the init
+    // let journal_dir = crate::journal::file::get_base_dir()?;
+    //
+    // // Retrieve details from config file
+    // let (_, _, _, timezone, editor ) =
+    //     crate::journal::file::get_config_details()?;
+    //
+    // // Create the file here
+    // let filepath_for_todays_entry = crate::journal::calculators::get_path_to_todays_entry(journal_dir, &timezone)?;
+    //
+    // // Calls the user's editor command, as deserialised from the config file
+    // let status = std::process::Command::new(&editor)
+    //     .arg(&filepath_for_todays_entry)
+    //     .status()?;
+    //
+    // // ? This is a dev print, but should we keep this?
+    // if status.success() {
+    //     println!("File opened in {}", editor);
+    // } else {
+    //     eprintln!("Failed to open file in {}", editor);
+    // }
 
     Ok(())
 }
