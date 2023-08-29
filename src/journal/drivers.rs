@@ -93,9 +93,9 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     let config_file_pathbuf = config_file_pathbuf.join("config.toml");
 
     // Check for file if file already exists
-    let proceed_with_writing = crate::journal::file::handle_file_exists(&config_file_pathbuf)?;
+    let is_proceed_with_writing = crate::journal::file::is_proceed_with_writing(&config_file_pathbuf)?;
 
-    if !proceed_with_writing {
+    if !is_proceed_with_writing {
         // Early return.  No file writing needed
         return Ok(());
     }
