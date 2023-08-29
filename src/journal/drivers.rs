@@ -14,6 +14,7 @@
  * along with this program. If not, see <https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12>.
  */
 
+use std::io::Read;
 use crate::journal::file::FileError;
 
 const MESSAGE_GREETING_CONFIG_INIT: &str = r#"
@@ -205,13 +206,64 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
         current_weather.visibility / 1000.0
     );
 
-    // The line that writes var file_message into the file.
-    std::io::Write::write_all(&mut file_for_todays_entry, preamble_str.as_bytes())?;
+    //
+    // The solution below is unnecessary.
+    // You don't need to create .temp_file
+    // Just write the file directly on the actual proper path
+    // and then check if it's empty.
+    // Delete if the user didn't write any changes.
 
-    // Calls the user's editor command, as deserialised from the config file
+    // Write temporary file to base_dir
+    let mut temporary_file = std::fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .open(crate::journal::file::get_temp_file_path()?)?;
+
+    std::io::Write::write_all(&mut temporary_file, preamble_str.as_bytes())?;
+
+    // Invoke Vim as a subprocess
     let status = std::process::Command::new(&editor)
-        .arg(&filepath_for_todays_entry)
-        .status()?;
+        .arg(&crate::journal::file::get_temp_file_path()?)
+        .stdin(std::process::Stdio::inherit())
+        .stdout(std::process::Stdio::inherit())
+        .stderr(std::process::Stdio::inherit())
+        .status()
+        .expect("Failed to start Vim");
+
+    if !status.success() {
+        println!("Vim was not successful");
+        return Ok(());
+    }
+
+
+    // Read the modified content from the temporary file
+    let mut modified_content = String::new();
+    std::fs::File::open(&crate::journal::file::get_temp_file_path()?)
+        .expect("Failed to open temporary file")
+        .read_to_string(&mut modified_content)
+        .expect("Failed to read temporary file");
+
+    // Check if there were any changes
+    if modified_content == preamble_str {
+        println!("No changes found.  Will not be writing into a new entry.");
+        return Ok(())
+    }
+
+    // Create the file's parent folder here
+    let filepath_for_todays_entry = crate::journal::calculators::get_path_to_todays_entry()?;
+    let filepath_for_todays_entry_parent =  std::path::Path::new(&filepath_for_todays_entry)
+        .parent()
+        .expect("Error in extracting parent of today's entry")
+        .to_str()
+        .expect("Error in converting Path to str");
+    std::fs::create_dir_all(filepath_for_todays_entry_parent)?;
+    let mut file_for_todays_entry = std::fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .open(&filepath_for_todays_entry)?;
+
+
+    std::io::Write::write_all(&mut file_for_todays_entry, modified_content.as_bytes())?;
 
     // ? This is a dev print, but should we keep this?
     if status.success() {
@@ -220,6 +272,8 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
         eprintln!("Failed to open file in {}", editor);
     }
 
+    // Clean up the temporary file
+    std::fs::remove_file(&crate::journal::file::get_temp_file_path()?).expect("Failed to remove temporary file");
     Ok(())
 }
 
