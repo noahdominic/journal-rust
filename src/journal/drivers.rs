@@ -147,7 +147,7 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
     let current_date = crate::journal::calculators::get_current_date_from_tz_as_str(&timezone)?;
 
     // Use info from config file to query weather from OpenMeteo API
-    let current_weather = crate::journal::query::api::for_weather_info(
+    let current_weather = crate::journal::query::open_meteo::for_weather_info(
         &(current_date
             .format("%Y-%m-%d %H:%M").to_string()),
         &location_latitude,
