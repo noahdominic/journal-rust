@@ -1,0 +1,36 @@
+WHAT THE USER SHOULD BE ABLE TO DO
+- Compose entries
+    journal new
+- View and search entries
+    journal open (open most recent entry)
+    journal list 10 (open 10 previous entries)
+    journal list
+- Edit entries
+- Delete entries
+
+## Journal entry format
+
+SUBJECT: User-filled
+
+Date: Automatically get from system
+Location: From config file
+
+Temperature: 31.9 C, feels like 35.2 C, Overcast skies.
+UV Index: 8.35  Sunrise: 05:35   Sunset: 17:54
+Rain: 0 mm
+Winds: 32.6 km/h SW
+Pressure: 1007.7 hPa
+Humidity: 62%
+Visibility: 24.14 km
+
+
+## Config file
+
+Always in home folder. If not in home folder,
+that is interpreted as the journal not being initialised.
+
+Contents
+- journal directory
+- location_humanReadable
+- location_latitude
+- location_longitude

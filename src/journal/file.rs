@@ -158,7 +158,6 @@ pub(crate) fn expand_file_path(file_name: &str) -> Result<std::path::PathBuf, Fi
     Ok(file_path)
 }
 
-
 /**
  * Handles the case where a configuration file already exists at the provided path.
  *
@@ -216,7 +215,6 @@ pub(crate) fn is_proceed_with_writing(
     Ok(true)
 }
 
-
 /**
  * Checks if a dotfile exists at the designated path.
  *
@@ -248,7 +246,6 @@ pub(crate) fn is_dotfile_exists() -> Result<bool, FileError> {
     Ok(get_dotfile_path()?.exists())
 }
 
-
 /**
  * Retrieves the path to the dotfile.
  *
@@ -279,7 +276,6 @@ pub(crate) fn get_dotfile_path() -> Result<std::path::PathBuf, FileError> {
         .ok_or(FileError::HomeDirNotFound)
         .map(|home_path| home_path.join(".journal"))
 }
-
 
 /**
  * Reads the content of the journal dotfile and returns the resulting path in it.
@@ -352,7 +348,8 @@ pub(crate) fn get_base_dir() -> Result<std::path::PathBuf, Box<dyn std::error::E
  * }
  * ```
  */
-pub(crate) fn get_config_details() -> Result<(String, String, String, String, String), Box<dyn std::error::Error>> {
+pub(crate) fn get_config_details(
+) -> Result<(String, String, String, String, String), Box<dyn std::error::Error>> {
     let config_file_path = get_base_dir()?;
 
     // Read the TOML content from the config file as a string
@@ -385,11 +382,10 @@ pub(crate) fn get_config_details() -> Result<(String, String, String, String, St
     ))
 }
 
-pub(crate) fn get_temp_file_path() -> Result<std::path::PathBuf, Box<dyn std::error::Error>>{
+pub(crate) fn get_temp_file_path() -> Result<std::path::PathBuf, Box<dyn std::error::Error>> {
     let config_file_path = get_base_dir()?;
     Ok(config_file_path.join(".temp_file"))
 }
-
 
 /**
  * Retrieves a string value from a TOML table based on the specified key.

@@ -1,0 +1,19 @@
+#0001 (v.0.4.0)     BUG
+DESC:   `open` doesn't accurately open today's entry.  Instead, it opens a 
+    new file with today's date _and time_.  As the file name for the previous 
+    entries will obviously have a time stamp in the past, it will create a 
+    new empty entry and open it instead.
+SOLN:   This can be removed by changing the behaviour of `open`.  Instead of 
+    opening creating a new time stamp and opening the file at that time stamp,
+    the new `open` func may
+        - Store today's DATE 
+        - Scan the directory for entries in today's DATE
+        - If there is not display a message;
+        - If there's only one, open it;
+        - If there's multiple, show the file name of each entry;
+        - The user will select the entry via index entry
+
+
+#0002 (v.0.4.0)     FEAT
+DESC:  Allow selection via arrow keys.  See https://www.reddit.com/r/rust/comments/hz3j1h/how_to_make_a_cli_in_rust_that_allows_the_user_to/
+    for more.
