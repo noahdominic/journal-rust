@@ -1,17 +1,7 @@
 /*
- * Copyright 2023 Noah Dominic Miranda Silvio
+ * Copyright 2023  Noah Dominic Miranda Silvio
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the European Union Public License version 1.2,
- * as published by the European Commission.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * European Union Public Licence for more details.
- *
- * You should have received a copy of the European Union Public Licence
- * along with this program. If not, see <https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12>.
+ * Licensed under the EUPL v1.2
  */
 
 /**
@@ -107,10 +97,17 @@ pub(crate) fn get_location_info(
  * }
  * ```
  */
-pub(crate) fn for_weather_info(date: &str, latitude: &str, longitude: &str, timezone: &str) -> Result<crate::journal::Weather, Box<dyn std::error::Error>> {
+pub(crate) fn for_weather_info(
+    date: &str,
+    latitude: &str,
+    longitude: &str,
+    timezone: &str,
+) -> Result<crate::journal::Weather, Box<dyn std::error::Error>> {
     // Getting weather info via API below...
-    let (current_date_iso, current_hour, timezone_url_ready) = crate::journal::calculators::preprocess_datetime_for_url(date, timezone);
-    let url = format!("https://api.open-meteo.com/v1/forecast?\
+    let (current_date_iso, current_hour, timezone_url_ready) =
+        crate::journal::calculators::preprocess_datetime_for_url(date, timezone);
+    let url = format!(
+        "https://api.open-meteo.com/v1/forecast?\
                                 latitude={latitude}\
                                 &longitude={longitude}\
                                 &hourly=\
@@ -129,21 +126,31 @@ pub(crate) fn for_weather_info(date: &str, latitude: &str, longitude: &str, time
                                     uv_index_max\
                                 &timezone={timezone_url_ready}\
                                 &start_date={current_date_iso}\
-                                &end_date={current_date_iso}");
+                                &end_date={current_date_iso}"
+    );
     let api_response_bytes = crate::journal::query::call_api(&url)?;
-    let api_response_native: crate::journal::WeatherResult = serde_json::from_slice(&api_response_bytes)?;
+    let api_response_native: crate::journal::WeatherResult =
+        serde_json::from_slice(&api_response_bytes)?;
     Ok(crate::journal::Weather {
-        temperature:            api_response_native.hourly.temperature_2m[current_hour],
-        apparent_temperature:   api_response_native.hourly.apparent_temperature[current_hour],
-        weather_code:           api_response_native.hourly.weathercode[current_hour],
-        rain:                   api_response_native.hourly.rain[current_hour],
-        windspeed:              api_response_native.hourly.windspeed_120m[current_hour],
-        winddirection:          api_response_native.hourly.winddirection_120m[current_hour],
-        pressure:               api_response_native.hourly.pressure_msl[current_hour],
-        humidity:               api_response_native.hourly.relativehumidity_2m[current_hour],
-        visibility:             api_response_native.hourly.visibility[current_hour],
-        uv_index:               api_response_native.daily.uv_index_max[0],
-        sunrise:                api_response_native.daily.sunrise[0].split("T").last().unwrap().to_string(),
-        sunset:                 api_response_native.daily.sunset[0].split("T").last().unwrap().to_string()
+        temperature: api_response_native.hourly.temperature_2m[current_hour],
+        apparent_temperature: api_response_native.hourly.apparent_temperature[current_hour],
+        weather_code: api_response_native.hourly.weathercode[current_hour],
+        rain: api_response_native.hourly.rain[current_hour],
+        windspeed: api_response_native.hourly.windspeed_120m[current_hour],
+        winddirection: api_response_native.hourly.winddirection_120m[current_hour],
+        pressure: api_response_native.hourly.pressure_msl[current_hour],
+        humidity: api_response_native.hourly.relativehumidity_2m[current_hour],
+        visibility: api_response_native.hourly.visibility[current_hour],
+        uv_index: api_response_native.daily.uv_index_max[0],
+        sunrise: api_response_native.daily.sunrise[0]
+            .split("T")
+            .last()
+            .unwrap()
+            .to_string(),
+        sunset: api_response_native.daily.sunset[0]
+            .split("T")
+            .last()
+            .unwrap()
+            .to_string(),
     })
 }

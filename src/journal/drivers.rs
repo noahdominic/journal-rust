@@ -1,21 +1,11 @@
 /*
- * Copyright 2023 Noah Dominic Miranda Silvio
+ * Copyright 2023  Noah Dominic Miranda Silvio
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the European Union Public License version 1.2,
- * as published by the European Commission.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * European Union Public Licence for more details.
- *
- * You should have received a copy of the European Union Public Licence
- * along with this program. If not, see <https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12>.
+ * Licensed under the EUPL v1.2
  */
 
-use std::io::Read;
 use crate::journal::file::FileError;
+use std::io::Read;
 
 const MESSAGE_GREETING_CONFIG_INIT: &str = r#"
 
@@ -94,7 +84,8 @@ pub(crate) fn init_new_config_driver() -> Result<(), Box<dyn std::error::Error>>
     let config_file_pathbuf = config_file_pathbuf.join("config.toml");
 
     // Check for file if file already exists
-    let is_proceed_with_writing = crate::journal::file::is_proceed_with_writing(&config_file_pathbuf)?;
+    let is_proceed_with_writing =
+        crate::journal::file::is_proceed_with_writing(&config_file_pathbuf)?;
 
     if !is_proceed_with_writing {
         // Early return.  No file writing needed
@@ -127,19 +118,14 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
     }
 
     // Retrieve details from config file
-    let (location_full_name,
-        location_latitude,
-        location_longitude,
-        timezone,
-        editor ) =
+    let (location_full_name, location_latitude, location_longitude, timezone, editor) =
         crate::journal::file::get_config_details()?;
 
     let current_date = crate::journal::calculators::get_current_date_from_tz_as_str(&timezone)?;
 
     // Use info from config file to query weather from OpenMeteo API
     let current_weather = crate::journal::query::open_meteo::for_weather_info(
-        &(current_date
-            .format("%Y-%m-%d %H:%M").to_string()),
+        &(current_date.format("%Y-%m-%d %H:%M").to_string()),
         &location_latitude,
         &location_longitude,
         &timezone,
@@ -235,7 +221,6 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
         return Ok(());
     }
 
-
     // Read the modified content from the temporary file
     let mut modified_content = String::new();
     std::fs::File::open(&crate::journal::file::get_temp_file_path()?)
@@ -246,12 +231,12 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
     // Check if there were any changes
     if modified_content == preamble_str {
         println!("No changes found.  Will not be writing into a new entry.");
-        return Ok(())
+        return Ok(());
     }
 
     // Create the file's parent folder here
     let filepath_for_todays_entry = crate::journal::calculators::get_path_to_todays_entry()?;
-    let filepath_for_todays_entry_parent =  std::path::Path::new(&filepath_for_todays_entry)
+    let filepath_for_todays_entry_parent = std::path::Path::new(&filepath_for_todays_entry)
         .parent()
         .expect("Error in extracting parent of today's entry")
         .to_str()
@@ -261,7 +246,6 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
         .create(true)
         .write(true)
         .open(&filepath_for_todays_entry)?;
-
 
     std::io::Write::write_all(&mut file_for_todays_entry, modified_content.as_bytes())?;
 
@@ -273,11 +257,12 @@ pub(crate) fn create_new_entry_driver() -> Result<(), Box<dyn std::error::Error>
     }
 
     // Clean up the temporary file
-    std::fs::remove_file(&crate::journal::file::get_temp_file_path()?).expect("Failed to remove temporary file");
+    std::fs::remove_file(&crate::journal::file::get_temp_file_path()?)
+        .expect("Failed to remove temporary file");
     Ok(())
 }
 
-pub(crate) fn open_entries_driver() ->  Result<(), Box<dyn std::error::Error>> {
+pub(crate) fn open_entries_driver() -> Result<(), Box<dyn std::error::Error>> {
     // Check if the journal is initialised
     // If it doesn't it execs an early return of Ok(())
     if !is_journal_initialised_checker()? {
@@ -285,8 +270,7 @@ pub(crate) fn open_entries_driver() ->  Result<(), Box<dyn std::error::Error>> {
     }
 
     // Retrieve details from config file
-    let (_, _, _, _, editor ) =
-        crate::journal::file::get_config_details()?;
+    let (_, _, _, _, editor) = crate::journal::file::get_config_details()?;
 
     // Create the file here
     let filepath_for_todays_entry = crate::journal::calculators::get_path_to_todays_entry()?;
@@ -305,7 +289,6 @@ pub(crate) fn open_entries_driver() ->  Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-
 
 fn is_journal_initialised_checker() -> Result<bool, FileError> {
     // Is it true that the file does NOT exist?
