@@ -17,3 +17,9 @@ SOLN:   This can be removed by changing the behaviour of `open`.  Instead of
 #0002 (v.0.4.0)     FEAT
 DESC:  Allow selection via arrow keys.  See https://www.reddit.com/r/rust/comments/hz3j1h/how_to_make_a_cli_in_rust_that_allows_the_user_to/
     for more.
+
+
+#0003 (v.0.4.0)     REFACTOR
+DESC:  Update the configfile names from `journal` to `CARGO_PKG_NAME`.
+    See https://stackoverflow.com/questions/27840394/how-can-a-rust-program-access-metadata-from-its-cargo-package
+    for more.
