@@ -57,7 +57,7 @@ Visibility: 11.32 km
 
 > [!NOTE]
 >
-> Currently, the `open function is still broken and opens a nonexisting file.
+> Currently, the `open` function is still broken and opens a nonexisting file.
 
 To open today's journal entry, use the `open` command. This allows you to add or modify the content of the entry.
 
