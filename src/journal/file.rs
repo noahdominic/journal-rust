@@ -133,7 +133,7 @@ pub(crate) fn expand_file_path(file_name: &str) -> Result<std::path::PathBuf, Fi
     if file_name.is_empty() {
         return dirs::home_dir()
             .ok_or(FileError::HomeDirNotFound)
-            .map(|home_path| home_path.join("journal"));
+            .map(|home_path| home_path.join(env!("CARGO_PKG_NAME")));
     }
 
     // Convert the file_name to a PathBuf
@@ -283,7 +283,7 @@ pub(crate) fn get_dotfile_path() -> Result<std::path::PathBuf, FileError> {
         std::fs::create_dir_all(&config_dir_path)
             .map_err(|_| FileError::FailedToCreateConfigDir)?;
 
-        return Ok(config_dir_path.join(".".to_owned() + env!("CARGO_PKG_NAME")));
+        return Ok(config_dir_path.join(env!("CARGO_PKG_NAME").to_owned() + ".conf"));
     }
 
     Err(FileError::ProjDirsNotFound)
