@@ -31,4 +31,5 @@ UPDATES:
                         - Linux:   /home/alice/.config/barapp
                         - Windows: C:\Users\Alice\AppData\Roaming\Foo Corp\Bar App
                         - macOS:   /Users/Alice/Library/Application Support/com.Foo-Corp.Bar-App
+    2024-01-08 1730     Changed default folder from ~/journal to ~/<CARGO_PKG_NAME>
 
