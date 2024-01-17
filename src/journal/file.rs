@@ -4,6 +4,9 @@
  * Licensed under the EUPL v1.2
  */
 
+use std::fs;
+
+use directories;
 use serde::de::Error;
 
 /**
@@ -33,6 +36,8 @@ use serde::de::Error;
 pub(crate) enum FileError {
     HomeDirNotFound,
     InvalidPath,
+    FailedToCreateConfigDir,
+    ProjDirsNotFound,
 }
 
 impl std::error::Error for FileError {}
@@ -42,6 +47,8 @@ impl std::fmt::Display for FileError {
         match self {
             FileError::HomeDirNotFound => write!(f, "Home directory not found"),
             FileError::InvalidPath => write!(f, "Path is invalid"),
+            FileError::FailedToCreateConfigDir => write!(f, "Filed to create config directory"),
+            FileError::ProjDirsNotFound => write!(f, "Project directory cannot be found"),
         }
     }
 }
@@ -261,10 +268,25 @@ pub(crate) fn is_dotfile_exists() -> Result<bool, FileError> {
  * ```
  */
 pub(crate) fn get_dotfile_path() -> Result<std::path::PathBuf, FileError> {
-    // Retrieve the user's home directory
-    dirs::home_dir()
-        .ok_or(FileError::HomeDirNotFound)
-        .map(|home_path| home_path.join(".journal"))
+    // Retrieve the project's directories
+    if let Some(proj_dirs) =
+        // from ProjectDirs::from("com", "Foo Corp", "Bar App"), you get...
+        // Linux:   /home/alice/.config/barapp
+        // Windows: C:\Users\Alice\AppData\Roaming\Foo Corp\Bar App
+        // macOS:   /Users/Alice/Library/Application Support/com.Foo-Corp.Bar-App
+        directories::ProjectDirs::from("com", "noahdominic", env!("CARGO_PKG_NAME"))
+    {
+        // Get config dir
+        let config_dir_path = proj_dirs.config_dir();
+
+        // Create the config directory if it doesn't exist
+        std::fs::create_dir_all(&config_dir_path)
+            .map_err(|_| FileError::FailedToCreateConfigDir)?;
+
+        return Ok(config_dir_path.join(".".to_owned() + env!("CARGO_PKG_NAME")));
+    }
+
+    Err(FileError::ProjDirsNotFound)
 }
 
 /**
