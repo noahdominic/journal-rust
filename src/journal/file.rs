@@ -4,8 +4,6 @@
  * Licensed under the EUPL v1.2
  */
 
-use std::fs;
-
 use directories;
 use serde::de::Error;
 
