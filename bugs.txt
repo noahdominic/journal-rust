@@ -22,7 +22,7 @@ DESC:  Allow selection via arrow keys.  See https://www.reddit.com/r/rust/commen
 
 
 #0003 (v.0.4.0)     REFACTOR
-STATUS: Currently working
+STATUS: Done
 DESC:  Update the configfile names from `journal` to `CARGO_PKG_NAME`.
     See https://stackoverflow.com/questions/27840394/how-can-a-rust-program-access-metadata-from-its-cargo-package
     for more.
