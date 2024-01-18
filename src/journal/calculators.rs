@@ -1,8 +1,5 @@
-/*
- * Copyright 2023  Noah Dominic Miranda Silvio
- *
- * Licensed under the EUPL v1.2
- */
+// Copyright 2023  Noah Dominic Miranda Silvio
+// Licensed under the EUPL v1.2
 
 /**
  * Generates the path to today's entry based on the provided base directory.

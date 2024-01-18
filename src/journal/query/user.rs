@@ -1,8 +1,5 @@
-/*
- * Copyright 2023  Noah Dominic Miranda Silvio
- *
- * Licensed under the EUPL v1.2
- */
+// Copyright 2023  Noah Dominic Miranda Silvio
+// Licensed under the EUPL v1.2
 
 #[derive(Debug)]
 struct UnexpectedChoiceError;

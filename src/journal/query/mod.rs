@@ -1,8 +1,6 @@
-/*
- * Copyright 2023  Noah Dominic Miranda Silvio
- *
- * Licensed under the EUPL v1.2
- */
+// Copyright 2023  Noah Dominic Miranda Silvio
+// Licensed under the EUPL v1.2
+
 
 pub(crate) mod open_meteo;
 pub(crate) mod user;
