@@ -12,10 +12,6 @@
  * It returns a `Result` containing the generated path as a `String` on success,
  * or a boxed `dyn std::error::Error` on failure.
  *
- * # Arguments
- *
- * - `base_dir`: A `PathBuf` representing the base directory for the entries.
- *
  * # Returns
  *
  * - `Result<String, Box<dyn std::error::Error>>`: A `Result` that contains the generated path to today's entry
@@ -51,6 +47,40 @@ pub(crate) fn get_path_to_todays_entry() -> Result<String, Box<dyn std::error::E
 
     // Return the path as a String
     Ok(today_entry_path)
+}
+
+pub(crate) fn get_all_path_to_todays_entry() -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let base_dir = crate::journal::file::get_base_dir()?;
+
+    let (_, _, _, timezone, _) = crate::journal::file::get_config_details()?;
+
+    // Get the current date
+    let current_date = get_current_date_from_tz_as_str(&timezone)?;
+
+    // Create the path to today's entry
+    let this_months_dir = format!(
+        "{}/{}",
+        base_dir.to_string_lossy(),
+        current_date.format("%Y/%m")
+    );
+
+    let day = format!("{}", current_date.format("%d"));
+
+    let entries: Vec<String> = std::fs::read_dir(this_months_dir)?
+        .filter_map(|entry| {
+            entry.ok().and_then(|e| {
+                let file_name_osstring = e.file_name();
+                let file_name = file_name_osstring.to_string_lossy();
+                (file_name.starts_with(&day) && file_name.ends_with(".txt"))
+                    .then_some(file_name.to_string())
+            })
+        })
+        .collect();
+
+    dbg!(&entries);
+
+    // Return the path as a String
+    Ok(entries)
 }
 
 /// Returns the cardinal direction as a string based on the given degrees.

@@ -273,8 +273,9 @@ pub(crate) fn open_entries_driver() -> Result<(), Box<dyn std::error::Error>> {
     let (_, _, _, _, editor) = crate::journal::file::get_config_details()?;
 
     // Create the file here
-    let filepath_for_todays_entry = crate::journal::calculators::get_path_to_todays_entry()?;
+    let filepath_for_todays_entry = crate::journal::calculators::get_all_path_to_todays_entry()?;
 
+    /*
     // Calls the user's editor command, as deserialised from the config file
     let status = std::process::Command::new(&editor)
         .arg(&filepath_for_todays_entry)
@@ -286,6 +287,7 @@ pub(crate) fn open_entries_driver() -> Result<(), Box<dyn std::error::Error>> {
     } else {
         eprintln!("Failed to open file in {}", editor);
     }
+     */
 
     Ok(())
 }
