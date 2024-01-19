@@ -288,6 +288,7 @@ pub(crate) fn open_entries_driver() -> Result<(), Box<dyn std::error::Error>> {
                 .status()?;
         }
         _ => {
+            let answer = crate::journal::query::user::ask_for_file_to_open(filepaths_for_todays_entry)?;
             return Ok(());
         }
     }
