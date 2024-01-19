@@ -55,10 +55,6 @@ Visibility: 11.32 km
 
 ### Opening Today's Journal Entry
 
-> [!NOTE]
->
-> Currently, the `open` function is still broken and opens a nonexisting file.
-
 To open today's journal entry, use the `open` command. This allows you to add or modify the content of the entry.
 
 ```bash
