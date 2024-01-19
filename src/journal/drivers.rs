@@ -284,11 +284,14 @@ pub(crate) fn open_entries_driver() -> Result<(), Box<dyn std::error::Error>> {
         },
         1 => {
             let _ = std::process::Command::new(&editor)
-                .arg(&filepaths_for_todays_entry[0]) // Index 0 should work, given the conditions
+                .arg(&filepaths_for_todays_entry[0].path()) // Index 0 should work, given the conditions… right?
                 .status()?;
         }
         _ => {
-            let answer = crate::journal::query::user::ask_for_file_to_open(filepaths_for_todays_entry)?;
+            let answer = crate::journal::query::user::ask_for_file_to_open(&filepaths_for_todays_entry)?;
+            let _ = std::process::Command::new(&editor)
+                .arg(answer.path().to_str().expect("Filepath should have been parse-able."))
+                .status()?;
             return Ok(());
         }
     }

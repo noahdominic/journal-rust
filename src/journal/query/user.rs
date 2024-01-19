@@ -4,6 +4,9 @@
  * Licensed under the EUPL v1.2
  */
 
+
+use std::fs::DirEntry;
+
 #[derive(Debug)]
 struct UnexpectedChoiceError;
 
@@ -100,4 +103,27 @@ fn ask_for_text_editor_input() -> Result<String, Box<dyn std::error::Error>> {
     )?;
 
     Ok(command)
+}
+
+pub(crate) fn ask_for_file_to_open(filepaths: &Vec<DirEntry>) -> Result<&DirEntry, Box<dyn std::error::Error>> {
+    let mut tries = 5;
+
+    println!("Looks like you have multiple files written today.  (File names are usually formatted as: '[Day].[Hour]-[Minute].txt'.)");
+    for (i, filepath) in filepaths.iter().enumerate() {
+        println!("{}. {}", i+1, filepath.file_name().to_str().expect("Filepath should have been parse-able."));
+    }
+
+    while tries > 0 {
+        if let Ok(choice) = crate::journal::query::for_usize("Which file would you want to open?") {
+            if choice > 0 && choice <= filepaths.len() {
+                return Ok(&filepaths[choice - 1]);
+            }
+        }
+
+        tries -= 1;
+        println!("Invalid index. Please try again.");
+    }
+
+    println!("Exceeded maximum failed attempts. Exiting...");
+    return Err(Box::try_from(crate::journal::query::PromptError::MaxTriesExceeded).unwrap());
 }

@@ -4,6 +4,8 @@
  * Licensed under the EUPL v1.2
  */
 
+use std::fs::DirEntry;
+
 /**
  * Generates the path to today's entry based on the provided base directory.
  *
@@ -49,7 +51,7 @@ pub(crate) fn get_path_to_todays_entry() -> Result<String, Box<dyn std::error::E
     Ok(today_entry_path)
 }
 
-pub(crate) fn get_all_path_to_todays_entry() -> Result<Vec<String>, Box<dyn std::error::Error>> {
+pub(crate) fn get_all_path_to_todays_entry() -> Result<Vec<DirEntry>, Box<dyn std::error::Error>> {
     let base_dir = crate::journal::file::get_base_dir()?;
 
     let (_, _, _, timezone, _) = crate::journal::file::get_config_details()?;
@@ -66,20 +68,17 @@ pub(crate) fn get_all_path_to_todays_entry() -> Result<Vec<String>, Box<dyn std:
 
     let day = format!("{}", current_date.format("%d"));
 
-    let entries: Vec<String> = std::fs::read_dir(this_months_dir)?
+    let entries: Vec<DirEntry> = std::fs::read_dir(this_months_dir)?
         .filter_map(|entry| {
             entry.ok().and_then(|e| {
                 let file_name_osstring = e.file_name();
                 let file_name = file_name_osstring.to_string_lossy();
                 (file_name.starts_with(&day) && file_name.ends_with(".txt"))
-                    .then_some(file_name.to_string())
+                    .then_some(e)
             })
         })
         .collect();
 
-    dbg!(&entries);
-
-    // Return the path as a String
     Ok(entries)
 }
 

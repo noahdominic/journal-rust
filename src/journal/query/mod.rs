@@ -10,6 +10,21 @@ pub(crate) mod user;
 use curl::easy::Easy;
 use std::io::Write;
 
+#[derive(Debug)]
+pub(crate) enum PromptError {
+    MaxTriesExceeded
+}
+
+impl std::error::Error for crate::journal::query::PromptError {}
+
+impl std::fmt::Display for crate::journal::query::PromptError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            crate::journal::query::PromptError::MaxTriesExceeded => write!(f, "Too many failed attempts!"),
+        }
+    }
+}
+
 /// Prints a string with blank line paddings.
 macro_rules! lnprint {
     ($($arg:tt)*) => {{
