@@ -5,6 +5,7 @@
 use crate::journal::file::FileError;
 use std::io::Read;
 
+
 const MESSAGE_GREETING_CONFIG_INIT: &str = r#"
 
 --Welcome to journal_CLI!--

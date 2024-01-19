@@ -3,6 +3,7 @@
 
 mod journal;
 
+
 // TODO:
 // - Offer choice to not have default location.   This will be done by typing
 //      'prefer not to say' or something like that.  Maybe a bool prompt?
