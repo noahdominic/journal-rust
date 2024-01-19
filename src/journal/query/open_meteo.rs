@@ -1,41 +1,41 @@
 // Copyright 2023  Noah Dominic Miranda Silvio
 // Licensed under the EUPL v1.2
 
-/**
- * Retrieves location information based on the provided full location string.
- *
- * This function takes a `full_location` string as input and extracts the city information
- * from it. It then makes an API call to the Open Meteo Geocoding API to retrieve location data
- * for the provided city. The API response is parsed and converted into a `Vec<crate::journal::Location>`
- * that represents location information. The function returns a `Result` containing the vector of
- * location information on success, or a boxed `dyn std::error::Error` on failure.
- *
- * # Arguments
- *
- * - `full_location`: A string representing the full location information, including the city.
- *   The city should be the last part of the comma-separated values.
- *
- * # Returns
- *
- * - `Result<Vec<crate::journal::Location>, Box<dyn std::error::Error>>`: A `Result` that contains
- *   a vector of `Location` objects representing the location information on success,
- *   or an error on failure.
- *
- * # Example
- *
- * ```no_run
- * fn main() -> Result<(), Box<dyn std::error::Error>> {
- *     let full_location = "Berlin, Germany";
- *     let location_info: Vec<crate::journal::Location> = get_location_info(full_location)?;
- *     for location in location_info {
- *         println!("City: {}", location.city);
- *         println!("Country: {}", location.country);
- *     }
- *     Ok(())
- * }
- * ```
- */
 
+/// 
+/// Retrieves location information based on the provided full location string.
+/// 
+/// This function takes a `full_location` string as input and extracts the city information
+/// from it. It then makes an API call to the Open Meteo Geocoding API to retrieve location data
+/// for the provided city. The API response is parsed and converted into a `Vec<crate::journal::Location>`
+/// that represents location information. The function returns a `Result` containing the vector of
+/// location information on success, or a boxed `dyn std::error::Error` on failure.
+/// 
+/// # Arguments
+/// 
+/// - `full_location`: A string representing the full location information, including the city.
+///   The city should be the last part of the comma-separated values.
+/// 
+/// # Returns
+/// 
+/// - `Result<Vec<crate::journal::Location>, Box<dyn std::error::Error>>`: A `Result` that contains
+///   a vector of `Location` objects representing the location information on success,
+///   or an error on failure.
+/// 
+/// # Example
+/// 
+/// ```no_run
+/// fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let full_location = "Berlin, Germany";
+///     let location_info: Vec<crate::journal::Location> = get_location_info(full_location)?;
+///     for location in location_info {
+///         println!("City: {}", location.city);
+///         println!("Country: {}", location.country);
+///     }
+///     Ok(())
+/// }
+/// ```
+/// 
 pub(crate) fn get_location_info(
     full_location: &str,
 ) -> Result<Vec<crate::journal::Location>, Box<dyn std::error::Error>> {
