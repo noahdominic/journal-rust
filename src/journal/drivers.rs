@@ -273,21 +273,24 @@ pub(crate) fn open_entries_driver() -> Result<(), Box<dyn std::error::Error>> {
     let (_, _, _, _, editor) = crate::journal::file::get_config_details()?;
 
     // Create the file here
-    let filepath_for_todays_entry = crate::journal::calculators::get_all_path_to_todays_entry()?;
+    let filepaths_for_todays_entry = crate::journal::calculators::get_all_path_to_todays_entry()?;
 
-    /*
-    // Calls the user's editor command, as deserialised from the config file
-    let status = std::process::Command::new(&editor)
-        .arg(&filepath_for_todays_entry)
-        .status()?;
+    let filepaths_count = filepaths_for_todays_entry.len();
 
-    // ? This is a dev print, but should we keep this?
-    if status.success() {
-        println!("File opened in {}", editor);
-    } else {
-        eprintln!("Failed to open file in {}", editor);
+    match filepaths_count {
+        0 => {
+            println!("You don't have entries written today.");
+            return Ok(());
+        },
+        1 => {
+            let _ = std::process::Command::new(&editor)
+                .arg(&filepaths_for_todays_entry[0]) // Index 0 should work, given the conditions
+                .status()?;
+        }
+        _ => {
+            return Ok(());
+        }
     }
-     */
 
     Ok(())
 }
@@ -304,3 +307,4 @@ fn is_journal_initialised_checker() -> Result<bool, FileError> {
 
     return Ok(true);
 }
+q
