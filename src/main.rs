@@ -1,10 +1,8 @@
-/*
- * Copyright 2023  Noah Dominic Miranda Silvio
- *
- * Licensed under the EUPL v1.2
- */
+// Copyright 2023  Noah Dominic Miranda Silvio
+// Licensed under the EUPL v1.2
 
 mod journal;
+
 
 // TODO:
 // - Offer choice to not have default location.   This will be done by typing

@@ -1,11 +1,10 @@
-/*
- * Copyright 2023  Noah Dominic Miranda Silvio
- *
- * Licensed under the EUPL v1.2
- */
+// Copyright 2023  Noah Dominic Miranda Silvio
+// Licensed under the EUPL v1.2
+
 
 use crate::journal::file::FileError;
 use std::io::Read;
+
 
 const MESSAGE_GREETING_CONFIG_INIT: &str = r#"
 

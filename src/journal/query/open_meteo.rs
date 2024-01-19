@@ -1,43 +1,41 @@
-/*
- * Copyright 2023  Noah Dominic Miranda Silvio
- *
- * Licensed under the EUPL v1.2
- */
+// Copyright 2023  Noah Dominic Miranda Silvio
+// Licensed under the EUPL v1.2
 
-/**
- * Retrieves location information based on the provided full location string.
- *
- * This function takes a `full_location` string as input and extracts the city information
- * from it. It then makes an API call to the Open Meteo Geocoding API to retrieve location data
- * for the provided city. The API response is parsed and converted into a `Vec<crate::journal::Location>`
- * that represents location information. The function returns a `Result` containing the vector of
- * location information on success, or a boxed `dyn std::error::Error` on failure.
- *
- * # Arguments
- *
- * - `full_location`: A string representing the full location information, including the city.
- *   The city should be the last part of the comma-separated values.
- *
- * # Returns
- *
- * - `Result<Vec<crate::journal::Location>, Box<dyn std::error::Error>>`: A `Result` that contains
- *   a vector of `Location` objects representing the location information on success,
- *   or an error on failure.
- *
- * # Example
- *
- * ```no_run
- * fn main() -> Result<(), Box<dyn std::error::Error>> {
- *     let full_location = "Berlin, Germany";
- *     let location_info: Vec<crate::journal::Location> = get_location_info(full_location)?;
- *     for location in location_info {
- *         println!("City: {}", location.city);
- *         println!("Country: {}", location.country);
- *     }
- *     Ok(())
- * }
- * ```
- */
+
+/// 
+/// Retrieves location information based on the provided full location string.
+/// 
+/// This function takes a `full_location` string as input and extracts the city information
+/// from it. It then makes an API call to the Open Meteo Geocoding API to retrieve location data
+/// for the provided city. The API response is parsed and converted into a `Vec<crate::journal::Location>`
+/// that represents location information. The function returns a `Result` containing the vector of
+/// location information on success, or a boxed `dyn std::error::Error` on failure.
+/// 
+/// # Arguments
+/// 
+/// - `full_location`: A string representing the full location information, including the city.
+///   The city should be the last part of the comma-separated values.
+/// 
+/// # Returns
+/// 
+/// - `Result<Vec<crate::journal::Location>, Box<dyn std::error::Error>>`: A `Result` that contains
+///   a vector of `Location` objects representing the location information on success,
+///   or an error on failure.
+/// 
+/// # Example
+/// 
+/// ```no_run
+/// fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let full_location = "Berlin, Germany";
+///     let location_info: Vec<crate::journal::Location> = get_location_info(full_location)?;
+///     for location in location_info {
+///         println!("City: {}", location.city);
+///         println!("Country: {}", location.country);
+///     }
+///     Ok(())
+/// }
+/// ```
+/// 
 pub(crate) fn get_location_info(
     full_location: &str,
 ) -> Result<Vec<crate::journal::Location>, Box<dyn std::error::Error>> {
@@ -54,49 +52,49 @@ pub(crate) fn get_location_info(
     Ok(api_response_native.results)
 }
 
-/**
- * Retrieves the current weather conditions (at a specific date and time)
- * for a given location.
- *
- * This function makes an API call to the Open Meteo API to get weather data
- * and then returns a `CurrentWeather` object that contains information about
- * the weather at the specified location.
- *
- * # Arguments
- *
- * - `date`: A string representing the date and time for which the weather data is to be retrieved.
- *   The date should be in ISO format, i.e., "YYYY-MM-DD HH:MM:SS".
- *   The hour is not optional and should be in 24-hour format.
- *   The minute and seconds are never checked.
- * - `latitude`: A string representing the latitude of the location for which the weather data is to be retrieved.
- *   This should be in decimal form.
- * - `longitude`: A string representing the longitude of the location for which the weather data is to be retrieved.
- *   This should be in decimal form.
- * - `timezone`: A string representing the timezone of the location for which the weather data is to be retrieved.
- *   The timezone should be in "Area/Location" format, such as "Europe/London".
- *   See IANA timezone databases for reference.
- *
- * # Returns
- *
- * - `CurrentWeather`: A `CurrentWeather` object containing information about the weather at the specified location.
- *
- * # Example
- *
- * ```
- * fn main() -> Result<(), Box<dyn std::error::Error>> {
- *     let date = "2023-08-21 13:45:00";
- *     let latitude = "52.5200";
- *     let longitude = "13.4050";
- *     let timezone = "Europe/Berlin";
- *
- *     let current_weather: CurrentWeather = get_current_weather(date, latitude, longitude, timezone)?;
- *     println!("Temperature: {}°C", current_weather.temperature);
- *     println!("Weather: {}", current_weather.weather_condition);
- *
- *     Ok(())
- * }
- * ```
- */
+/// 
+/// Retrieves the current weather conditions (at a specific date and time)
+/// for a given location.
+/// 
+/// This function makes an API call to the Open Meteo API to get weather data
+/// and then returns a `CurrentWeather` object that contains information about
+/// the weather at the specified location.
+/// 
+/// # Arguments
+/// 
+/// - `date`: A string representing the date and time for which the weather data is to be retrieved.
+///   The date should be in ISO format, i.e., "YYYY-MM-DD HH:MM:SS".
+///   The hour is not optional and should be in 24-hour format.
+///   The minute and seconds are never checked.
+/// - `latitude`: A string representing the latitude of the location for which the weather data is to be retrieved.
+///   This should be in decimal form.
+/// - `longitude`: A string representing the longitude of the location for which the weather data is to be retrieved.
+///   This should be in decimal form.
+/// - `timezone`: A string representing the timezone of the location for which the weather data is to be retrieved.
+///   The timezone should be in "Area/Location" format, such as "Europe/London".
+///   See IANA timezone databases for reference.
+/// 
+/// # Returns
+/// 
+/// - `CurrentWeather`: A `CurrentWeather` object containing information about the weather at the specified location.
+/// 
+/// # Example
+/// 
+/// ```
+/// fn main() -> Result<(), Box<dyn std::error::Error>> {
+///     let date = "2023-08-21 13:45:00";
+///     let latitude = "52.5200";
+///     let longitude = "13.4050";
+///     let timezone = "Europe/Berlin";
+/// 
+///     let current_weather: CurrentWeather = get_current_weather(date, latitude, longitude, timezone)?;
+///     println!("Temperature: {}°C", current_weather.temperature);
+///     println!("Weather: {}", current_weather.weather_condition);
+/// 
+///     Ok(())
+/// }
+/// ```
+/// 
 pub(crate) fn for_weather_info(
     date: &str,
     latitude: &str,
