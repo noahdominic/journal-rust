@@ -307,4 +307,3 @@ fn is_journal_initialised_checker() -> Result<bool, FileError> {
 
     return Ok(true);
 }
-q
