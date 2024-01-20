@@ -4,7 +4,9 @@ Journey 2 is a simple command-line tool for maintaining a text-based journal. Th
 
 ## Installation
 
-In the future, you may download pre-compiled binaries in the Releases section.
+### Download from Releases
+
+There are precompiled binaries for Linux+GNU, FreeBSD, and macOS in the [Releases](https://github.com/noahdominic/journey-2/releases) page. (Note that I haven't tested the ARM binaries for macOS. [I don't have an ARM MacBook ☹️]). If you don't see your computer's configuration, you can build from source.
 
 ### Building from source
 
