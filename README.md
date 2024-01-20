@@ -83,7 +83,7 @@ Journal entries are stored as text files within the same directory as the config
 
 ## Licence
 
-This project is licenced under the European Union Public Licence version 1.2 (EUPL-1.2). You can find the full text of the EUPL-1.2 licence in the [LICENCE](LICENCE) file.
+This project is licensed under the European Union Public Licence version 1.2 (EUPL-1.2). You can find the full text of the EUPL-1.2 licence in the [LICENCE](LICENCE) file.
 
 ---
 
