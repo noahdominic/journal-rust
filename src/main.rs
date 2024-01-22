@@ -1,16 +1,10 @@
 // Copyright 2023  Noah Dominic Miranda Silvio
 // Licensed under the EUPL v1.2
 
-mod journal;
-
-
-// TODO:
-// - Offer choice to not have default location.   This will be done by typing
-//      'prefer not to say' or something like that.  Maybe a bool prompt?
-//      Or maybe when they put an empty string for the location?
+extern crate journey2;
 
 fn main() {
-    match journal::journal_main_driver() {
+    match journey2::core::handle_main() {
         Ok(_) => (),
         Err(e) => println!("Error: {}", e),
     }
