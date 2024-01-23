@@ -3,6 +3,7 @@
 
 mod args;
 mod interaction;
+extern crate journey2;
 
 use indoc;
 
@@ -58,6 +59,9 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
     Al Quds Open University, Gaza...........Will list locations named 'Gaza';
                                                 user will need to choose.
     "#});
+
+    // ask for location
+    // let (default_location_string, default_location) = interaction::ask::ask_user_for_location()?;
 
     Ok(())
 }
