@@ -1,8 +1,8 @@
 // Copyright 2023, 2024  Noah Dominic Miranda Silvio.  All rights reserved.
 // Licensed under the EUPL v1.2
 
-mod ask;
-mod qtemp;
+pub(in crate::cli) mod ask;
+pub(in crate::cli) mod qtemp;
 
 use crossterm;
 

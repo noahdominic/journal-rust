@@ -60,7 +60,7 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
     "#});
 
     // ask for location
-    // let (default_location_string, default_location) = interaction::ask::ask_user_for_location()?;
+    let (default_location_string, default_location) = interaction::ask::ask_user_for_location()?;
 
     Ok(())
 }

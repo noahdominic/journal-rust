@@ -3,6 +3,12 @@ pub mod strman;
 
 use serde;
 
+/// Struct for location details
+///
+/// # Note
+///
+/// This structure is heavily dependent on Open Meteo's API structure.  They
+/// must someday be decoupled to decrease `core`'s dependence on `om_api`.
 #[derive(Debug, serde::Deserialize, Clone)]
 pub(crate) struct Location {
     name: String,
@@ -48,4 +54,15 @@ impl std::fmt::Display for Location {
             self.timezone
         )
     }
+}
+
+/// Struct for Open Meteo's geolocation API
+///
+/// # Note
+///
+/// This structure is heavily dependent on Open Meteo's API structure.  They
+/// must someday be decoupled to decrease `core`'s dependence on `om_api`.
+#[derive(Debug, serde::Deserialize)]
+struct GeoResult {
+    results: Vec<Location>,
 }
