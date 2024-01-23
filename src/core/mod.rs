@@ -1,3 +1,5 @@
+mod geo;
+
 use serde;
 
 #[derive(Debug, serde::Deserialize, Clone)]
