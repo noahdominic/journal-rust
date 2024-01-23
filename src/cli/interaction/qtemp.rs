@@ -25,6 +25,12 @@ macro_rules! lnprint {
 /// * `question` - The 'question' that is printed.  Typically a question.
 /// * `hint` - Additional information for the user's comprehension.  
 ///            This will be placed in brackets and printed after the question.
+///
+/// # Note
+///
+/// This function is heavily reused.  Almost all functions with prefix
+/// `prompt_user_for` will call this function.  This function is of
+/// critical importance.
 pub(in crate::cli::interaction) fn prompt_user_for_string(
     question: &str,
     hint: &str,
