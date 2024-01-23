@@ -4,7 +4,7 @@
 extern crate journey2;
 
 fn main() {
-    match journey2::core::handle_main() {
+    match journey2::cli::handle_main() {
         Ok(_) => (),
         Err(e) => println!("Error: {}", e),
     }
