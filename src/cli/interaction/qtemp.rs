@@ -31,7 +31,7 @@ pub(in crate::cli::interaction) fn prompt_user_for_string(
 ) -> std::io::Result<String> {
     let mut user_response = String::new();
 
-    lnprint!("{question} ({hint})");
+    lnprint!("{question} ({hint}): ");
     std::io::stdout().flush()?;
     std::io::stdin().read_line(&mut user_response)?;
 
