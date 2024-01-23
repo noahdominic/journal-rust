@@ -2,10 +2,9 @@
 // Licensed under the EUPL v1.2
 
 extern crate journey2;
-mod cli;
 
 fn main() {
-    match cli::handle_main() {
+    match journey2::cli::handle_main() {
         Ok(_) => (),
         Err(e) => println!("Error: {}", e),
     }

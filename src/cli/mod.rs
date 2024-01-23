@@ -3,7 +3,6 @@
 
 mod args;
 mod interaction;
-extern crate journey2;
 
 use indoc;
 
