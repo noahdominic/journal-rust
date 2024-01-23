@@ -41,3 +41,12 @@ UPDATES:
     2024-01-17 1749     Config file already follows XDG.
 NOTES:
     - If the journal folder is placed in ~/.local, is the dotfile in ~/.config unnecessary?
+
+
+#0005               FIX
+STATUS: Ready 
+DESC:  Properly handle No-Location-Found case in `init`
+
+#006                BEHAVIOUR
+STATUS: Ready 
+DESC:  In `init`, make user verify their settings before asking for file location of config file.
