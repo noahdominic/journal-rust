@@ -365,12 +365,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "indoc"
-version = "2.0.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e186cfbae8084e513daff4240b4797e342f988cecda4fb6c939150f96315fd8"
-
-[[package]]
 name = "isocountry"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -397,7 +391,6 @@ dependencies = [
  "curl",
  "directories",
  "dirs",
- "indoc",
  "isocountry",
  "press-btn-continue",
  "serde",

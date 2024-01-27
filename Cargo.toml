@@ -13,7 +13,6 @@ crossterm = "0.27.0"
 curl = "0.4.44"
 directories = "5.0.1"
 dirs = "5.0.1"
-indoc = "2.0.4"
 isocountry = "0.3.2"
 press-btn-continue = "0.2.0"
 serde = { version = "1.0.152", features = ["derive"] }
