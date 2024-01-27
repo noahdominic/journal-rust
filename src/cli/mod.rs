@@ -27,7 +27,7 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
         --Welcome to Journey!--
         
         This command-line interface app is here to help you document your thoughts,
-        experiences, and ideas effortlessly.  Let's get you started :)        
+        experiences, and ideas effortlessly.  Let's get you started :)
 
         Let's initialise your journal.
     "#});
@@ -44,10 +44,6 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
     in your entries.  To ensure the best results, make sure that the last part of
     your location is somewhere that is specific enough for accurate time zone and
     weather data.
-    
-    Don't worry---if your city has the same name as a city elsewhere, like Los
-    Angeles in Los Santos or San Francisco in Cebu, you would be asked to pick
-    which city you meant.
     
     Examples:                               
     Avenida 9 SO - Carchi, Guayaquil........Will list locations named 'Guayaquil';

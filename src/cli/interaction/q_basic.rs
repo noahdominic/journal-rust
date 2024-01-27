@@ -1,9 +1,9 @@
 // Copyright 2023, 2024  Noah Dominic Miranda Silvio.  All rights reserved.
 // Licensed under the EUPL v1.2
 
-//! Contains primitive prompt functions for user input
+//! Contains the basis prompt-functions for user input
 //!
-//! Primitive prompts functions are the fundamental unit by which
+//! The basis prompt-functions are the fundamental unit by which
 //! more complex prompts are built upon.
 
 use std::io::Write;
