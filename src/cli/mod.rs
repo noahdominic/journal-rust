@@ -18,8 +18,6 @@ impl std::fmt::Display for HelperMessage{
 
 This command-line interface app is here to help you document your thoughts,
 experiences, and ideas effortlessly.  Let's get you started :)
-
-Let's initialise your journal.
 "#
             ),
             HelperMessage::TutorialLocation => write!(f, r#"
@@ -32,18 +30,17 @@ your location is somewhere that is specific enough for accurate time zone and
 weather data.
 
 Examples:
-Avenida 9 SO - Carchi, Guayaquil........Will list locations named 'Guayaquil';
-                                            user will need to choose.
-Lor Marzuki, Singapore City.............Only one location named 'Singapore
-                                            City', which is automatically
-                                            chosen.
-Al Quds Open University, Gaza...........Will list locations named 'Gaza';
-                                            user will need to choose.
+  Avenida 9 SO - Carchi, Guayaquil
+  1600 Pennsylvania Avenue NW, Washington, D.C
+  Lor Marzuki, Singapore City
+  Al Quds Open University, Gaza
+  25 Paddington Grn, City of Westminster
 "#
             ),
             HelperMessage::TutorialEditor => write!(f, r#"
-Journey does not use its own text editor and will separately run
-a text editor of your own choosing, like vim, nano, and emacs.
+--Set your editor--
+
+Journey lets you use your preferred text editor, such as vim, nano, or emacs.
 "#
             )
         }
@@ -73,9 +70,30 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
     // ask for location
     println!("\n\n{}", HelperMessage::TutorialLocation);
     let (default_location_string, default_location) = interaction::ask::ask_user_for_location()?;
+    let _ = interaction::pause()?;
 
     // ask for location
     println!("\n\n{}", HelperMessage::TutorialEditor);
+    let editor = interaction::ask::ask_for_editor_multichoice()?;
+
+    let config_contents = format!(
+        "[defaults]\n\
+        location_full_name=\"{}\"\n\
+        location_latitude=\"{}\"\n\
+        location_longitude=\"{}\"\n\
+        timezone=\"{}\"\n\
+        editor=\"{}\"\n",
+        default_location_string,
+        default_location.latitude,
+        default_location.longitude,
+        default_location.timezone,
+        editor
+    );
+
+    println!(
+        "\nHere are the settings we've made for you: \n{}",
+        config_contents
+    );
     Ok(())
 }
 

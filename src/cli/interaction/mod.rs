@@ -4,8 +4,54 @@
 pub(in crate::cli) mod ask;
 pub(in crate::cli) mod q_basic;
 
-use crossterm;
-use crate::cli::interaction;
+use crate::core;
+
+
+#[derive(Debug)]
+pub(in crate::cli) enum InteractionError {
+    IoError(std::io::Error),
+    ParseIntError(std::num::ParseIntError),
+    JourneyCoreError(core::JourneyCoreError)
+}
+
+impl From<std::io::Error> for InteractionError {
+    fn from(error: std::io::Error) -> Self {
+        InteractionError::IoError(error)
+    }
+}
+
+impl From<std::num::ParseIntError> for InteractionError {
+    fn from(error: std::num::ParseIntError) -> Self {
+        InteractionError::ParseIntError(error)
+    }
+}
+
+impl From<core::JourneyCoreError> for InteractionError {
+    fn from(error: core::JourneyCoreError) -> Self {
+        InteractionError::JourneyCoreError(error)
+    }
+}
+
+impl std::fmt::Display for InteractionError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            InteractionError::IoError(ref err) => err.fmt(f),
+            InteractionError::ParseIntError(ref err) => err.fmt(f),
+            InteractionError::JourneyCoreError(ref err) => err.fmt(f),
+        }
+    }
+}
+
+impl std::error::Error for InteractionError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            InteractionError::ParseIntError(err) => Some(err),
+            InteractionError::IoError(err) => Some(err),
+            InteractionError::JourneyCoreError(err) => Some(err),
+        }
+    }
+}
+
 
 pub(in crate::cli) fn pause() -> std::io::Result<()> {
     #[cfg(windows)]

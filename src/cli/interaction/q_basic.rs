@@ -8,6 +8,7 @@
 
 use std::io::Write;
 
+
 /// Prints a string with blank line paddings.
 ///
 /// An aesthetic choice.  Most prompts look better when prepended with a newline.
@@ -51,12 +52,12 @@ pub(in crate::cli::interaction) fn prompt_user_for_choice<'a, T>(
     msg_when_invalid_choice: &'a str,
     msg_when_no_more_chances: &'a str,
     choices: &'a [T],
-) -> Result<&'a T, Box<dyn std::error::Error>>
+) -> Result<&'a T, crate::cli::interaction::InteractionError>
 where
     T: std::fmt::Display,
 {
     match choices.len() {
-        0 => Err(Box::new(std::io::Error::new(
+        0 => Err(crate::cli::interaction::InteractionError::from(std::io::Error::new(
             std::io::ErrorKind::NotFound,
             msg_when_none,
         ))),
@@ -68,7 +69,7 @@ where
             }
             let mut chances = 5;
             while chances > 0 {
-                let choice = prompt_for_usize(choice_prompt)?;
+                let choice = prompt_user_for_usize(choice_prompt)?;
                 if choice > 0 && choice <= choices.len() {
                     return Ok(&choices[choice - 1]);
                 } else {
@@ -76,7 +77,7 @@ where
                 }
                 chances -= 1;
             }
-            return Err(Box::new(std::io::Error::new(
+            return Err(crate::cli::interaction::InteractionError::from(std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 msg_when_no_more_chances,
             )));
@@ -84,9 +85,9 @@ where
     }
 }
 
-pub(in crate::cli::interaction) fn prompt_for_usize(
+pub(in crate::cli::interaction) fn prompt_user_for_usize(
     question: &str,
-) -> Result<usize, Box<dyn std::error::Error>> {
+) -> Result<usize, crate::cli::interaction::InteractionError> {
     let user_response = prompt_user_for_string(question, "[index]")?;
     Ok(user_response.trim().parse::<usize>()?)
 }
