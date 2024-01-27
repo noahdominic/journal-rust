@@ -12,9 +12,9 @@ use serde;
 #[derive(Debug, serde::Deserialize, Clone)]
 pub(crate) struct Location {
     name: String,
-    latitude: f64,
-    longitude: f64,
-    timezone: String,
+    pub(crate) latitude: f64,
+    pub(crate) longitude: f64,
+    pub(crate) timezone: String,
     country_code: String,
     admin1: Option<String>,
     admin2: Option<String>,
@@ -66,3 +66,33 @@ impl std::fmt::Display for Location {
 struct GeoResult {
     results: Vec<Location>,
 }
+
+
+#[derive(Debug)]
+pub enum JourneyCoreError {
+    SerdeJsonError(serde_json::Error),
+    CurlError(curl::Error)
+}
+
+impl From<serde_json::Error> for JourneyCoreError {
+    fn from(error: serde_json::Error) -> Self {
+        JourneyCoreError::SerdeJsonError(error)
+    }
+}
+
+impl From<curl::Error> for JourneyCoreError {
+    fn from(error: curl::Error) -> Self {
+        JourneyCoreError::CurlError(error)
+    }
+}
+
+impl std::fmt::Display for JourneyCoreError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            JourneyCoreError::SerdeJsonError(ref err) => err.fmt(f),
+            JourneyCoreError::CurlError(ref err) => err.fmt(f),
+        }
+    }
+}
+
+impl std::error::Error for JourneyCoreError {}

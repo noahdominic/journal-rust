@@ -1,11 +1,11 @@
-pub(crate) fn split_location(raw_location: &str) -> Result<&str, &'static str> {
+pub(crate) fn split_location(raw_location: &str) -> &str {
     let city = raw_location
         .rsplit(',')
         .next()
-        .ok_or("Invalid raw_location format")?
+        .unwrap_or(raw_location)
         .trim();
 
-    Ok(city)
+    city
 }
 
 pub(crate) fn sanitise_spaces_html(input: &str) -> String {
