@@ -1,5 +1,5 @@
 pub mod geo;
-pub mod strman;
+pub mod str_man;
 
 use serde;
 

@@ -9,7 +9,7 @@ pub(in crate::cli) fn ask_user_for_location(
         "[optional address specifiers], <location>",
     )?;
 
-    let city = core::strman::sanitise_spaces_html(core::strman::split_location(&full_address)?);
+    let city = core::str_man::sanitise_spaces_html(core::str_man::split_location(&full_address)?);
 
     let api_response_native = core::geo::get_location_info(&city)?;
 
