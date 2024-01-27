@@ -5,6 +5,8 @@ pub(crate) fn get_location_info(query: &str) -> Result<Vec<u8>, curl::Error> {
 
 pub(crate) fn call_api(url: &str) -> Result<Vec<u8>, curl::Error> {
     let mut api_caller = curl::easy::Easy::new();
+    #[cfg(windows)]
+    api_caller.ssl_options(curl::easy::SslOpt::new().no_revoke(true))?;
     api_caller.url(url)?;
     let mut api_response_bytes = Vec::new();
     {
