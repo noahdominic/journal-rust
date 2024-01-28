@@ -1,3 +1,6 @@
+//! Contains functions concerning geolocation
+
+
 use crate::core;
 use crate::om_api;
 
@@ -5,13 +8,13 @@ use crate::om_api;
 ///
 /// # Arguments
 ///
-/// - `query`: A `&str` representing the ra search query for the API.  
-///   Processing will be handled by the the 3rd-party API function.
+/// - `query`: A `&str` representing the search query for the API.
+///   Processing will be handled by a 3rd-party API function.
 ///
 /// # Note
 ///
-/// Currently, this function relies on `core::GeoResult`, which causes a
-/// dependence on Open Meteo's API.  This must be changed.
+/// Currently, this function relies on `core::GeoResult`, which is based
+/// on the OpenMeteo API's response.
 pub(crate) fn get_location_info(
     query: &str,
 ) -> Result<Vec<core::Location>, core::JourneyCoreError> {

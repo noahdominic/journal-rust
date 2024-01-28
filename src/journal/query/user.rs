@@ -95,7 +95,7 @@ pub(crate) fn ask_for_text_editor_multchoice() -> Result<String, Box<dyn std::er
 
 fn ask_for_text_editor_input() -> Result<String, Box<dyn std::error::Error>> {
     let command = crate::journal::query::for_string(
-        "What command would you use to call your favourite text editor?",
+        "What commandwould you use to call your favourite text editor?",
         "vim | nano | pico | ...",
     )?;
 

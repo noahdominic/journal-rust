@@ -74,7 +74,7 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
 
     // ask for location
     println!("\n\n{}", HelperMessage::TutorialEditor);
-    let editor = interaction::ask::ask_for_editor_multichoice()?;
+    let editor = interaction::ask::ask_for_editor()?;
 
     let config_contents = format!(
         "[defaults]\n\
@@ -94,6 +94,16 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
         "\nHere are the settings we've made for you: \n{}",
         config_contents
     );
+
+    if crate::core::file::is_config_file_exists()? {
+        if !interaction::ask::ask_if_to_overwrite_config()? {
+            // Was cancelled
+            return Ok(());
+        }
+    }
+
+    crate::core::file::write_contents_to_config_file(config_contents)?;
+
     Ok(())
 }
 

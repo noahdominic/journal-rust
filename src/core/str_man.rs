@@ -1,3 +1,5 @@
+//! Contains functions concerning string manipulation
+
 pub(crate) fn split_location(raw_location: &str) -> &str {
     let city = raw_location
         .rsplit(',')

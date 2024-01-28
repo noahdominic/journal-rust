@@ -1,18 +1,15 @@
 // ask_user_for_location
 
-use crate::core;
-use crate::cli;
-
 pub(in crate::cli) fn ask_user_for_location(
-) -> Result<(String, core::Location), cli::interaction::InteractionError> {
+) -> Result<(String, crate::core::Location), crate::cli::interaction::InteractionError> {
     let full_address: String = super::q_basic::prompt_user_for_string(
         "What is your usual location?",
         "[optional address specifiers], <location>",
     )?;
 
-    let city = core::str_man::sanitise_spaces_html(core::str_man::split_location(&full_address));
+    let city = crate::core::str_man::sanitise_spaces_html(crate::core::str_man::split_location(&full_address));
 
-    let api_response_native = core::geo::get_location_info(&city)?;
+    let api_response_native = crate::core::geo::get_location_info(&city)?;
 
     let city_info = super::q_basic::prompt_user_for_choice(
         "There are no locations in the database with that name.",
@@ -28,9 +25,9 @@ pub(in crate::cli) fn ask_user_for_location(
     Ok((full_address, city_info.clone()))
 }
 
-pub(in crate::cli) fn ask_for_editor_multichoice() -> Result<String, cli::interaction::InteractionError> {
+pub(in crate::cli) fn ask_for_editor() -> Result<String, crate::cli::interaction::InteractionError> {
     let choice = super::q_basic::prompt_user_for_usize(
-        r#"Which text editor would you like to use?
+        r#"Which text editor would you like to use?  (You have to install this separately.)
     1. Vim
     2. Emacs
     3. Nano
@@ -46,7 +43,7 @@ pub(in crate::cli) fn ask_for_editor_multichoice() -> Result<String, cli::intera
         5 => ask_for_custom_editor_input()?,
         _ => {
             // Early return here.
-            return Err(cli::interaction::InteractionError::from(std::io::Error::new(
+            return Err(crate::cli::interaction::InteractionError::from(std::io::Error::new(
                 std::io::ErrorKind::Unsupported,
                 "Uh oh!  Something happened that shouldn't have happened.",
             )));
@@ -63,4 +60,16 @@ fn ask_for_custom_editor_input() -> std::io::Result<String> {
     )?;
 
     Ok(command)
+}
+
+pub(in crate::cli) fn ask_if_to_overwrite_config() -> std::io::Result<bool> {
+    if !super::q_basic::prompt_user_for_bool(
+        "It seems like Journey already been initialised. \
+        Would you like to overwrite the current existing config file with your new details?")?{
+        println!("Config initialisation cancelled.");
+
+        return Ok(false);
+    }
+
+    Ok(true)
 }

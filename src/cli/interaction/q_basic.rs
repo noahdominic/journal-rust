@@ -32,7 +32,7 @@ macro_rules! lnprint {
 /// This function is heavily reused.  Almost all functions with prefix
 /// `prompt_user_for` will call this function.  This function is of
 /// critical importance.
-pub(in crate::cli::interaction) fn prompt_user_for_string(
+pub(super) fn prompt_user_for_string(
     question: &str,
     hint: &str,
 ) -> std::io::Result<String> {
@@ -45,19 +45,19 @@ pub(in crate::cli::interaction) fn prompt_user_for_string(
     Ok(user_response.trim_end().to_string())
 }
 
-pub(in crate::cli::interaction) fn prompt_user_for_choice<'a, T>(
+pub(super) fn prompt_user_for_choice<'a, T>(
     msg_when_none: &'a str,
     msg_when_many: &'a str,
     choice_prompt: &'a str,
     msg_when_invalid_choice: &'a str,
     msg_when_no_more_chances: &'a str,
     choices: &'a [T],
-) -> Result<&'a T, crate::cli::interaction::InteractionError>
+) -> Result<&'a T, super::InteractionError>
 where
     T: std::fmt::Display,
 {
     match choices.len() {
-        0 => Err(crate::cli::interaction::InteractionError::from(std::io::Error::new(
+        0 => Err(super::InteractionError::from(std::io::Error::new(
             std::io::ErrorKind::NotFound,
             msg_when_none,
         ))),
@@ -77,7 +77,7 @@ where
                 }
                 chances -= 1;
             }
-            return Err(crate::cli::interaction::InteractionError::from(std::io::Error::new(
+            return Err(super::InteractionError::from(std::io::Error::new(
                 std::io::ErrorKind::InvalidInput,
                 msg_when_no_more_chances,
             )));
@@ -85,9 +85,20 @@ where
     }
 }
 
-pub(in crate::cli::interaction) fn prompt_user_for_usize(
+pub(in super) fn prompt_user_for_usize(
     question: &str,
-) -> Result<usize, crate::cli::interaction::InteractionError> {
+) -> Result<usize, super::InteractionError> {
     let user_response = prompt_user_for_string(question, "[index]")?;
     Ok(user_response.trim().parse::<usize>()?)
 }
+
+
+pub(super) fn prompt_user_for_bool(
+    question: &str,
+) -> std::io::Result<bool> {
+    let answer = prompt_user_for_string(question, "y/N")?.trim().to_lowercase();
+
+    // Cursed idea? ===>  Ok(["yes", "y", "yeah"].iter().any(|&x| x == answer))
+    Ok(answer == "yes" || answer == "y" || answer == "yeah")
+}
+
