@@ -1,6 +1,6 @@
-# Journey 2
+# Journey2
 
-Journey 2 is a simple command-line tool for maintaining a text-based journal. This Rust project provides you with the ability to initialise your journal, create new entries, and open created entries. Entries are stored as text files, which should make access and compatibility easy.
+Journey2 is a simple CLI tool for maintaining a text-based journal. This Rust project provides you with the ability to initialize your journal, create new entries, and open created entries. Entries are stored as text files, which should make access and compatibility easy.
 
 ## Installation
 
