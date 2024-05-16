@@ -113,3 +113,13 @@ pub(crate) fn write_contents_to_config_file(config_contents: String) -> Result<(
 
     Ok(())
 }
+
+pub(crate) fn get_raw_content_of_config_file() -> Result<ConfData, ConfigError> {
+    let config_file_path = get_config_file_path()?;
+
+    let contents = std::fs::read_to_string(config_file_path)?;
+
+    let conf_data: ConfData = toml::from_str(&contents)?;
+
+    Ok(conf_data)
+}
