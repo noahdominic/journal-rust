@@ -1,9 +1,12 @@
 // Copyright 2023, 2024  Noah Dominic Miranda Silvio
 // Licensed under the EUPL v1.2
 
-
 use directories;
+use serde::Deserialize;
+use toml;
 
+/// Represents errors that can occur during file operations in the application.
+///
 #[derive(Debug)]
 pub(crate) enum FileError {
     FailedToCreateConfigDir,
@@ -22,7 +25,9 @@ impl std::error::Error for FileError {}
 impl std::fmt::Display for FileError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            FileError::FailedToCreateConfigDir => write!(f, "Failed to create Journey's config directory."),
+            FileError::FailedToCreateConfigDir => {
+                write!(f, "Failed to create Journey's config directory.")
+            }
             FileError::ProjDirsNotFound => write!(f, "Project directories cannot be found."),
             FileError::ErrorDuringWriting(ref err) => err.fmt(f),
         }
@@ -93,7 +98,8 @@ fn get_config_file_path() -> Result<std::path::PathBuf, FileError> {
     if let Some(proj_dirs) = directories::ProjectDirs::from("", "", env!("CARGO_PKG_NAME")) {
         let config_dir_path = proj_dirs.config_dir();
 
-        std::fs::create_dir_all(&config_dir_path).map_err(|_| FileError::FailedToCreateConfigDir)?;
+        std::fs::create_dir_all(&config_dir_path)
+            .map_err(|_| FileError::FailedToCreateConfigDir)?;
 
         return Ok(config_dir_path.join("config.toml"));
     }
