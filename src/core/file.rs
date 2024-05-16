@@ -28,6 +28,21 @@ impl std::fmt::Display for FileError {
         }
     }
 }
+// Expected structure for config file
+// P.S.  I wish Rust had inline nested struct declarations
+#[derive(Debug, Deserialize)]
+struct ConfDefaults {
+    location_full_name: String,
+    location_latitude: f64,
+    location_longitude: f64,
+    timezone: String,
+    editor: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct ConfData {
+    config: ConfDefaults,
+}
 
 fn get_config_file_path() -> Result<std::path::PathBuf, FileError> {
     if let Some(proj_dirs) = directories::ProjectDirs::from("", "", env!("CARGO_PKG_NAME")) {
