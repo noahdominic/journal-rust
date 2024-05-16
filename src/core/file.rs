@@ -28,6 +28,51 @@ impl std::fmt::Display for FileError {
         }
     }
 }
+
+/// Wrapper for all the errors that can occur during contact with the config file
+///
+#[derive(Debug)]
+pub enum ConfigError {
+    File(FileError),
+    Toml(toml::de::Error),
+}
+
+impl From<std::io::Error> for ConfigError {
+    fn from(error: std::io::Error) -> Self {
+        ConfigError::File(FileError::ErrorDuringWriting(error))
+    }
+}
+
+impl From<FileError> for ConfigError {
+    fn from(error: FileError) -> Self {
+        ConfigError::File(error)
+    }
+}
+
+impl From<toml::de::Error> for ConfigError {
+    fn from(error: toml::de::Error) -> Self {
+        ConfigError::Toml(error)
+    }
+}
+
+impl std::fmt::Display for ConfigError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ConfigError::File(ref err) => err.fmt(f),
+            ConfigError::Toml(ref err) => err.fmt(f),
+        }
+    }
+}
+
+impl std::error::Error for ConfigError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            ConfigError::File(ref err) => Some(err),
+            ConfigError::Toml(ref err) => Some(err),
+        }
+    }
+}
+
 // Expected structure for config file
 // P.S.  I wish Rust had inline nested struct declarations
 #[derive(Debug, Deserialize)]
