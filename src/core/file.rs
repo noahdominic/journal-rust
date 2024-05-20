@@ -80,18 +80,29 @@ impl std::error::Error for ConfigError {
 
 // Expected structure for config file
 // P.S.  I wish Rust had inline nested struct declarations
+// P.P.S I wish the `serde` package had automatic type deserialisers
 #[derive(Debug, Deserialize)]
 struct ConfDefaults {
     location_full_name: String,
+    #[serde(deserialize_with = "serde_string_as_f64")]
     location_latitude: f64,
+    #[serde(deserialize_with = "serde_string_as_f64")]
     location_longitude: f64,
     timezone: String,
     editor: String,
 }
 
+fn serde_string_as_f64<'de, D>(deserializer: D) -> Result<f64, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+{
+    let s = String::deserialize(deserializer)?;
+    s.parse::<f64>().map_err(serde::de::Error::custom)
+}
+
 #[derive(Debug, Deserialize)]
-struct ConfData {
-    config: ConfDefaults,
+pub struct ConfData {
+    defaults: ConfDefaults,
 }
 
 fn get_config_file_path() -> Result<std::path::PathBuf, FileError> {
