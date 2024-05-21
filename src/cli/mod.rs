@@ -54,7 +54,7 @@ pub fn handle_main() -> Result<(), Box<dyn std::error::Error>> {
     if let Some(command) = args.journal_command {
         match command {
             args::JournalCommand::Init => handle_init()?,
-            args::JournalCommand::New => (),
+            args::JournalCommand::New => handle_new()?,
             args::JournalCommand::Open => (),
         }
     }
@@ -107,4 +107,9 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
+    let config_data = crate::core:file::get_config_from_config_file()?;
 
+    println!("{:?}", config_data);
+    Ok()
+}
