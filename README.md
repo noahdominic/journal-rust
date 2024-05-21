@@ -12,10 +12,10 @@ There are precompiled binaries for Linux+GNU, FreeBSD, and macOS in the [Release
 
 Make sure you have Rust and Cargo installed on your system. You can install them by following the instructions on the [Rust website](https://www.rust-lang.org/tools/install).
 
-Once Rust and Cargo are installed, you can clone this repository and build the `journey2` executable by running the following commands:
+Once Rust and Cargo are installed, you can clone the `stable` branch of this repository and build the `journey2` executable by running the following commands:
 
 ```bash
-git clone https://github.com/noahdominic/journey2.git
+git clone --branch stable --single-branch https://github.com/noahdominic/journey2.git
 cd journey2
 cargo build --release
 ```
