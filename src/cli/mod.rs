@@ -111,5 +111,5 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
     let config_data = crate::core::file::get_config_from_config_file()?;
 
     println!("{:?}", config_data);
-    Ok()
+    Ok(())
 }
