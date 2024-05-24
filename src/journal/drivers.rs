@@ -1,10 +1,8 @@
 // Copyright 2023  Noah Dominic Miranda Silvio
 // Licensed under the EUPL v1.2
 
-
 use crate::journal::file::FileError;
 use std::io::Read;
-
 
 const MESSAGE_GREETING_CONFIG_INIT: &str = r#"
 
@@ -280,16 +278,22 @@ pub(crate) fn open_entries_driver() -> Result<(), Box<dyn std::error::Error>> {
         0 => {
             println!("You don't have entries written today.");
             return Ok(());
-        },
+        }
         1 => {
             let _ = std::process::Command::new(&editor)
                 .arg(&filepaths_for_todays_entry[0].path()) // Index 0 should work, given the conditions… right?
                 .status()?;
         }
         _ => {
-            let answer = crate::journal::query::user::ask_for_file_to_open(&filepaths_for_todays_entry)?;
+            let answer =
+                crate::journal::query::user::ask_for_file_to_open(&filepaths_for_todays_entry)?;
             let _ = std::process::Command::new(&editor)
-                .arg(answer.path().to_str().expect("Filepath should have been parse-able."))
+                .arg(
+                    answer
+                        .path()
+                        .to_str()
+                        .expect("Filepath should have been parse-able."),
+                )
                 .status()?;
             return Ok(());
         }
