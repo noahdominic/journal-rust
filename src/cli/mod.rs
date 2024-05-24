@@ -13,17 +13,21 @@ enum HelperMessage {
     TutorialEditor,
 }
 
-impl std::fmt::Display for HelperMessage{
+impl std::fmt::Display for HelperMessage {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            HelperMessage::TutorialWelcome => write!(f, r#"
+            HelperMessage::TutorialWelcome => write!(
+                f,
+                r#"
 --Welcome to Journey!--
 
 This command-line interface app is here to help you document your thoughts,
 experiences, and ideas effortlessly.  Let's get you started :)
 "#
             ),
-            HelperMessage::TutorialLocation => write!(f, r#"
+            HelperMessage::TutorialLocation => write!(
+                f,
+                r#"
 --Set your usual location--
 
 Your journal will use your default location to automatically detect your
@@ -40,12 +44,14 @@ Examples:
   25 Paddington Grn, City of Westminster
 "#
             ),
-            HelperMessage::TutorialEditor => write!(f, r#"
+            HelperMessage::TutorialEditor => write!(
+                f,
+                r#"
 --Set your editor--
 
 Journey lets you use your preferred text editor, such as vim, nano, or emacs.
 "#
-            )
+            ),
         }
     }
 }
