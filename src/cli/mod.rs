@@ -2,7 +2,10 @@
 // Licensed under the EUPL v1.2
 
 mod args;
+mod helper;
 mod interaction;
+
+use crate as journey2;
 
 enum HelperMessage {
     TutorialWelcome,
@@ -108,7 +111,11 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
-    let config_data = crate::core::file::get_config_from_config_file()?;
+    if !helper::is_journal_initialised()? {
+        return Ok(()); // Early return if journal not initialised
+    }
+
+    let config_data = journey2::core::file::get_config_from_config_file()?;
 
     println!("{:?}", config_data);
     Ok(())
