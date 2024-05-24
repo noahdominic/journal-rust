@@ -98,14 +98,14 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
         config_contents
     );
 
-    if crate::core::file::is_config_file_exists()? {
+    if journey2::core::file::is_config_file_exists()? {
         if !interaction::ask::ask_if_to_overwrite_config()? {
             // Was cancelled
             return Ok(());
         }
     }
 
-    crate::core::file::write_contents_to_config_file(config_contents)?;
+    journey2::core::file::write_contents_to_config_file(config_contents)?;
 
     Ok(())
 }
