@@ -1,14 +1,14 @@
 // Copyright 2023, 2024  Noah Dominic Miranda Silvio
 // Licensed under the EUPL v1.2
 
-
 //! Contains the core functionality required for maintaining Journey.
 //!
 //! The module handles API calls, file path-finding, writing entries.
 
+pub mod chrono;
+pub mod file;
 pub mod geo;
 pub mod str_man;
-pub mod file;
 
 use serde;
 
@@ -76,11 +76,10 @@ struct GeoResult {
     results: Vec<Location>,
 }
 
-
 #[derive(Debug)]
 pub enum JourneyCoreError {
     SerdeJsonError(serde_json::Error),
-    CurlError(curl::Error)
+    CurlError(curl::Error),
 }
 
 impl From<serde_json::Error> for JourneyCoreError {
