@@ -124,5 +124,13 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
     let config_data = journey2::core::file::get_config_from_config_file()?;
 
     println!("{:?}", config_data);
+
+    let (location_full_name, location_latitude, location_longitude, timezone, editor) = (
+        config_data.defaults.location_full_name,
+        config_data.defaults.location_latitude,
+        config_data.defaults.location_longitude,
+        config_data.defaults.timezone,
+        config_data.defaults.editor,
+    );
     Ok(())
 }
