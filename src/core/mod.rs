@@ -5,11 +5,11 @@
 //!
 //! The module handles API calls, file path-finding, writing entries.
 
-pub mod chrono;
-pub mod file;
-pub mod geo;
-pub mod str_man;
-pub mod weather;
+pub(crate) mod chrono;
+pub(crate) mod file;
+pub(crate) mod geo;
+pub(crate) mod str_man;
+pub(crate) mod weather;
 
 use serde;
 
