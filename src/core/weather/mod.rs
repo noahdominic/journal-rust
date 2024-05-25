@@ -1,4 +1,4 @@
-mod query;
+pub(crate) mod query;
 
 pub(crate) struct Weather {
     temperature: f64,
