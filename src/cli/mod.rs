@@ -117,6 +117,37 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
+    let weather_map = std::collections::HashMap::from([
+        (0, "Clear skies"),
+        (1, "Mainly clear skies"),
+        (2, "Partly cloudy skies"),
+        (3, "Overcast skies"),
+        (45, "Fog"),
+        (48, "Fog"),
+        (51, "Light drizzle"),
+        (53, "Moderate drizzle"),
+        (55, "Heavy drizzle"),
+        (56, "Light drizzle, freezing"),
+        (57, "Moderate or heavy drizzle, freezing"),
+        (61, "Light rain"),
+        (63, "Moderate rain"),
+        (65, "Heavy rain"),
+        (66, "Light rain, freezing"),
+        (67, "Moderate or heavy rain, freezing"),
+        (71, "Snow fall: Slight intensity"),
+        (73, "Snow fall: Moderate intensity"),
+        (75, "Snow fall: Heavy intensity"),
+        (77, "Snow grains"),
+        (80, "Light rain showers"),
+        (81, "Moderate rain showers"),
+        (82, "Violent rainshowers"),
+        (85, "Snow showers: Slight intensity"),
+        (86, "Snow showers: Heavy intensity"),
+        (95, "Thunderstorm: Slight or moderate"),
+        (96, "Thunderstorm with slight hail"),
+        (99, "Thunderstorm with heavy hail"),
+    ]);
+
     if !helper::is_journal_initialised()? {
         return Ok(()); // Early return if journal not initialised
     }
