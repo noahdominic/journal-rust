@@ -9,6 +9,7 @@ pub mod chrono;
 pub mod file;
 pub mod geo;
 pub mod str_man;
+pub mod weather;
 
 use serde;
 
