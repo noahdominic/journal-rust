@@ -1,5 +1,6 @@
 pub(crate) mod query;
 
+#[derive(Debug)]
 pub(crate) struct Weather {
     temperature: f64,
     apparent_temperature: f64,
