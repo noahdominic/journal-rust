@@ -21,3 +21,20 @@ pub(crate) fn get_current_date_from_tz_as_str(
 
     Ok(chrono::Utc::now().with_timezone(&timezone))
 }
+
+pub fn preprocess_datetime_for_url(date: &str) -> (String, usize) {
+    // Split the combined date and time string
+    let mut date_iter = date.split_whitespace();
+    let current_date_iso = date_iter.next().unwrap().trim().to_string();
+    let current_hour = date_iter
+        .next()
+        .unwrap()
+        .split(":")
+        .next()
+        .unwrap()
+        .parse::<usize>()
+        .unwrap();
+
+    // Return the extracted date, hour, and URL-ready timezone
+    (current_date_iso, current_hour)
+}
