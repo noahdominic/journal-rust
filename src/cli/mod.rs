@@ -174,6 +174,36 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
         &timezone
     )?;
 
+    let preamble_str = format!(
+        "DATE: {}\n\
+        LOCATION: {}\n\
+        \n\
+        Temperature: {} C, feels like {} C, {}.\n\
+        UV Index: {}  Sunrise: {}   Sunset: {}\n\
+        Rain: {} mm\n\
+        Winds: {} km/h {}\n\
+        Pressure: {} hPa\n\
+        Humidity: {}%\n\
+        Visibility: {} km\n\
+        ",
+        current_date.format("%a, %Y %b %d %H:%M:%S %Z (%:z)"),
+        location_full_name,
+        current_weather.temperature,
+        current_weather.apparent_temperature,
+        weather_map
+            .get(&current_weather.weather_code)
+            .unwrap_or(&"Unknown conditions"),
+        current_weather.uv_index,
+        current_weather.sunrise,
+        current_weather.sunset,
+        current_weather.rain,
+        current_weather.windspeed,
+        journey2::core::helper::get_direction(current_weather.winddirection),
+        current_weather.pressure,
+        current_weather.humidity,
+        current_weather.visibility / 1000.0
+    );
+
     println!(
         "{:?}",
         journey2::core::chrono::get_current_date_from_tz_as_str(&timezone)
@@ -183,6 +213,8 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
         "{:?}",
         current_weather
     );
+
+    println!("{}", preamble_str);
 
     Ok(())
 }
