@@ -10,6 +10,7 @@ pub(crate) mod file;
 pub(crate) mod geo;
 pub(crate) mod str_man;
 pub(crate) mod weather;
+pub(crate) mod helper;
 
 use serde;
 
