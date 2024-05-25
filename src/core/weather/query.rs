@@ -6,7 +6,7 @@ pub(crate) fn query_current_weather(
     longitude: &str,
     timezone: &str,
 ) -> Result<journey2::core::weather::Weather, Box<dyn std::error::Error>> {
-    let (current_date_iso, current_hour) = journey2::core::chrono::preprocess_datetime_for_url(date)?;
+    let (current_date_iso, current_hour) = journey2::core::chrono::preprocess_datetime_for_url(date);
     let timezone_url_ready = journey2::core::chrono::preprocess_timezone_for_url(timezone);
 
     // Calling the API now...
