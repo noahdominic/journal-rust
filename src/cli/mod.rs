@@ -139,7 +139,7 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
     let current_weather = journey2::core::weather::query::query_current_weather(
         &current_date.to_string(),
         &location_latitude.to_string(),
-        &location_latitude.to_string(),
+        &location_longitude.to_string(),
         &timezone
     )?;
 
