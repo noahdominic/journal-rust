@@ -2,18 +2,18 @@ pub(crate) mod query;
 
 #[derive(Debug)]
 pub(crate) struct Weather {
-    temperature: f64,
-    apparent_temperature: f64,
-    weather_code: usize,
-    rain: f64,
-    windspeed: f64,
-    winddirection: f64,
-    pressure: f64,
-    humidity: f64,
-    visibility: f64,
-    uv_index: f64,
-    sunrise: String,
-    sunset: String,
+    pub(crate) temperature: f64,
+    pub(crate) apparent_temperature: f64,
+    pub(crate) weather_code: usize,
+    pub(crate) rain: f64,
+    pub(crate) windspeed: f64,
+    pub(crate) winddirection: f64,
+    pub(crate) pressure: f64,
+    pub(crate) humidity: f64,
+    pub(crate) visibility: f64,
+    pub(crate) uv_index: f64,
+    pub(crate) sunrise: String,
+    pub(crate) sunset: String,
 }
 
 #[derive(Debug, serde::Deserialize)]
