@@ -132,5 +132,24 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
         config_data.defaults.timezone,
         config_data.defaults.editor,
     );
+
+    let current_date =
+        journey2::core::chrono::get_current_date_from_tz_as_str(&timezone)?;
+
+    println!(
+        "{:?}",
+        journey2::core::chrono::get_current_date_from_tz_as_str(&timezone)
+    );
+
+    println!(
+        "{:?}",
+        journey2::core::weather::query::query_current_weather(
+            &current_date.to_string(),
+            &location_latitude.to_string(),
+            &location_latitude.to_string(),
+            &timezone
+        )?
+    );
+
     Ok(())
 }
