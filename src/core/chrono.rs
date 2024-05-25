@@ -38,3 +38,9 @@ pub fn preprocess_datetime_for_url(date: &str) -> (String, usize) {
     // Return the extracted date, hour, and URL-ready timezone
     (current_date_iso, current_hour)
 }
+
+pub fn preprocess_timezone_for_url(timezone: &str) -> String {
+    // TBH this feels so silly, but this makes things more semantic, i.e. easy to read
+    timezone.replace("/", "%2F")
+}
+
