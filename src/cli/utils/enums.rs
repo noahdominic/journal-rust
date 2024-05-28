@@ -48,7 +48,7 @@ Journey lets you use your preferred text editor, such as vim, nano, or emacs.
 }
 
 // Yes, I'm aware this isn't an enum or a data structure, but it IS a getter to a data structure
-pub fn get_weather_map() -> std::collections::HashMap<i32, &'static str> {
+pub fn get_weather_map() -> std::collections::HashMap<usize, &'static str> {
     std::collections::HashMap::from([
         (0, "Clear skies"),
         (1, "Mainly clear skies"),
