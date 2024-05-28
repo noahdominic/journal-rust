@@ -2,59 +2,13 @@
 // Licensed under the EUPL v1.2
 
 mod args;
-mod helper;
 mod interaction;
+mod utils {
+    pub(crate) mod enums;
+    pub(crate) mod functions;
+}
 
 use crate as journey2;
-
-enum HelperMessage {
-    TutorialWelcome,
-    TutorialLocation,
-    TutorialEditor,
-}
-
-impl std::fmt::Display for HelperMessage {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            HelperMessage::TutorialWelcome => write!(
-                f,
-                r#"
---Welcome to Journey!--
-
-This command-line interface app is here to help you document your thoughts,
-experiences, and ideas effortlessly.  Let's get you started :)
-"#
-            ),
-            HelperMessage::TutorialLocation => write!(
-                f,
-                r#"
---Set your usual location--
-
-Your journal will use your default location to automatically detect your
-default time zone and to detect the current weather.  This will also be printed
-in your entries.  To ensure the best results, make sure that the last part of
-your location is somewhere that is specific enough for accurate time zone and
-weather data.
-
-Examples:
-  Avenida 9 SO - Carchi, Guayaquil
-  1600 Pennsylvania Avenue NW, Washington, D.C
-  Lor Marzuki, Singapore City
-  Al Quds Open University, Gaza
-  25 Paddington Grn, City of Westminster
-"#
-            ),
-            HelperMessage::TutorialEditor => write!(
-                f,
-                r#"
---Set your editor--
-
-Journey lets you use your preferred text editor, such as vim, nano, or emacs.
-"#
-            ),
-        }
-    }
-}
 
 /** Calls the appropriate function for each subcommand (`init`, `new`, `open`)
  */
@@ -73,16 +27,16 @@ pub fn handle_main() -> Result<(), Box<dyn std::error::Error>> {
 /** Runs the journal initialisation routine
 */
 fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
-    println!("{}", HelperMessage::TutorialWelcome);
+    println!("{}", utils::enums::HelperMessage::TutorialWelcome);
     let _ = interaction::pause()?;
 
     // ask for location
-    println!("\n\n{}", HelperMessage::TutorialLocation);
+    println!("\n\n{}", utils::enums::HelperMessage::TutorialLocation);
     let (default_location_string, default_location) = interaction::ask::ask_user_for_location()?;
     let _ = interaction::pause()?;
 
     // ask for location
-    println!("\n\n{}", HelperMessage::TutorialEditor);
+    println!("\n\n{}", utils::enums::HelperMessage::TutorialEditor);
     let editor = interaction::ask::ask_for_editor()?;
 
     let config_contents = format!(
@@ -148,7 +102,7 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
         (99, "Thunderstorm with heavy hail"),
     ]);
 
-    if !helper::is_journal_initialised()? {
+    if !utils::functions::is_journal_initialised()? {
         return Ok(()); // Early return if journal not initialised
     }
 
@@ -164,14 +118,13 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
         config_data.defaults.editor,
     );
 
-    let current_date =
-        journey2::core::chrono::get_current_date_from_tz_as_str(&timezone)?;
+    let current_date = journey2::core::chrono::get_current_date_from_tz_as_str(&timezone)?;
 
     let current_weather = journey2::core::weather::query::query_current_weather(
         &current_date.to_string(),
         &location_latitude.to_string(),
         &location_longitude.to_string(),
-        &timezone
+        &timezone,
     )?;
 
     let preamble_str = format!(
@@ -209,10 +162,7 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
         journey2::core::chrono::get_current_date_from_tz_as_str(&timezone)
     );
 
-    println!(
-        "{:?}",
-        current_weather
-    );
+    println!("{:?}", current_weather);
 
     println!("{}", preamble_str);
 
