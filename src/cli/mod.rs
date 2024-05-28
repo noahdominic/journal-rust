@@ -75,9 +75,15 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(()); // Early return if journal not initialised
     }
 
-    let preamble_str = utils::functions::generate_preamble();
+    let config_data = journey2::core::file::get_config_from_config_file()?.defaults;
 
-    println!("{}", preamble_str);
+    let preamble_str = utils::functions::generate_preamble(
+        &config_data.location_full_name,
+        config_data.location_latitude,
+        config_data.location_longitude,
+        &config_data.timezone)?;
+
+    print!("{}", preamble_str);
 
     Ok(())
 }

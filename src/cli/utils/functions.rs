@@ -13,22 +13,17 @@ pub(crate) fn is_journal_initialised() -> Result<bool, journey2::core::file::Fil
     Ok(is_journal_initialised)
 }
 
-pub(crate) fn generate_preamble() -> Result<String, Box<dyn std::error::Error>> {
+pub(crate) fn generate_preamble(
+    location_full_name: &str,
+    location_latitude: f64,
+    location_longitude: f64,
+    timezone: &str,
+) -> Result<String, Box<dyn std::error::Error>> {
     let weather_map = utils::enums::get_weather_map();
-
-    let config_data = journey2::core::file::get_config_from_config_file()?;
-
-    let (location_full_name, location_latitude, location_longitude, timezone, editor) = (
-        config_data.defaults.location_full_name,
-        config_data.defaults.location_latitude,
-        config_data.defaults.location_longitude,
-        config_data.defaults.timezone,
-        config_data.defaults.editor,
-    );
 
     let current_date = journey2::core::chrono::get_current_date_from_tz_as_str(&timezone)?;
 
-    let current_weather = journey2::core::weather::query::query_current_weather(
+    let current_weather = journey2::core::weather::query::get_current_weather_at_location_and_time(
         &current_date.to_string(),
         &location_latitude.to_string(),
         &location_longitude.to_string(),
