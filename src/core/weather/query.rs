@@ -1,6 +1,6 @@
 use crate as journey2;
 
-pub(crate) fn query_current_weather(
+pub(crate) fn get_current_weather_at_location_and_time(
     date: &str,
     latitude: &str,
     longitude: &str,
