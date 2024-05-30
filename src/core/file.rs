@@ -10,6 +10,7 @@ use toml;
 #[derive(Debug)]
 pub(crate) enum FileError {
     FailedToCreateConfigDir,
+    FailedToCreateDataDir,
     ProjDirsNotFound,
     ErrorDuringWriting(std::io::Error),
 }
@@ -27,6 +28,9 @@ impl std::fmt::Display for FileError {
         match self {
             FileError::FailedToCreateConfigDir => {
                 write!(f, "Failed to create Journey's config directory.")
+            },
+            FileError::FailedToCreateDataDir => {
+                write!(f, "Failed to create Journey's data directory.")
             }
             FileError::ProjDirsNotFound => write!(f, "Project directories cannot be found."),
             FileError::ErrorDuringWriting(ref err) => err.fmt(f),
