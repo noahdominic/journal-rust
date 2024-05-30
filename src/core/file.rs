@@ -137,6 +137,25 @@ fn get_config_file_path() -> Result<std::path::PathBuf, FileError> {
     Err(FileError::ProjDirsNotFound)
 }
 
+pub fn get_data_dir_path() -> Result<std::path::PathBuf, FileError> {
+    let proj_dirs =
+        directories::ProjectDirs::from("", "", env!("CARGO_PKG_NAME"))
+            .ok_or(FileError::ProjDirsNotFound)?;
+
+    let data_dir_path = proj_dirs.data_dir();
+
+    std::fs::create_dir_all(&data_dir_path)
+        .map_err(|_| FileError::FailedToCreateDataDir)?;
+
+    Ok(std::path::PathBuf::from(data_dir_path))
+}
+
+pub(crate) fn get_temp_file_path() -> Result<std::path::PathBuf, FileError> {
+    Ok(get_data_dir_path()?.join(".temp_entry"))
+}
+
+// If X exists checkers
+////////////////////////////////////////////////////////////////////////////////////////////////////
 pub(crate) fn is_config_file_exists() -> Result<bool, FileError> {
     Ok(get_config_file_path()?.exists())
 }
