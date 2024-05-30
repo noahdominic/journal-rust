@@ -3,6 +3,7 @@ use crate::cli::utils;
 
 pub(crate) fn is_journal_initialised() -> Result<bool, journey2::core::file::FileError> {
     let is_journal_initialised = journey2::core::file::is_config_file_exists()?;
+pub(crate) fn is_journal_initialised_frontend() -> Result<bool, journey2::core::file::FileError> {
 
     if !is_journal_initialised {
         println!(

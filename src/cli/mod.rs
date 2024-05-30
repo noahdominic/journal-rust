@@ -71,7 +71,7 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
-    if !utils::functions::is_journal_initialised()? {
+    if !utils::functions::is_journal_initialised_frontend()? {
         return Ok(()); // Early return if journal not initialised
     }
 
