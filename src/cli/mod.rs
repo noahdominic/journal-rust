@@ -8,6 +8,8 @@ mod utils {
     pub(crate) mod functions;
 }
 
+use std::io::Read;
+
 use crate as journey2;
 
 /** Calls the appropriate function for each subcommand (`init`, `new`, `open`)
