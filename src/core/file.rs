@@ -49,7 +49,7 @@ impl std::fmt::Display for FileError {
 /// Wrapper for all the errors that can occur during contact with the config file
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 #[derive(Debug)]
-pub enum ConfigError {
+pub(crate) enum ConfigError {
     File(FileError),
     Toml(toml::de::Error),
 }
