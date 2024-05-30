@@ -77,11 +77,17 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
 
     let config_data = journey2::core::file::get_config_from_config_file()?.defaults;
 
-    let preamble_str = utils::functions::generate_preamble(
-        &config_data.location_full_name,
-        config_data.location_latitude,
-        config_data.location_longitude,
-        &config_data.timezone)?;
+    let current_date = journey2::core::chrono::get_current_date_from_tz_as_str(&config_data.timezone)?;
+
+    let current_weather = journey2::core::weather::query::get_current_weather_at_location_and_time(
+        &current_date.to_string(),
+        &config_data.location_latitude.to_string(),
+        &config_data.location_longitude.to_string(),
+        &config_data.timezone,
+    )?;
+
+
+    let preamble_str = utils::functions::generate_preamble(&config_data.location_full_name, &current_date, current_weather);
 
     print!("{}", preamble_str);
 
