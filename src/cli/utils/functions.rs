@@ -36,7 +36,7 @@ pub(crate) fn generate_preamble(
         location_full_name,
         current_weather.temperature,
         current_weather.apparent_temperature,
-        weather_map
+        utils::enums::get_weather_map()
             .get(&current_weather.weather_code)
             .unwrap_or(&"Unknown conditions"),
         current_weather.uv_index,
