@@ -17,10 +17,8 @@ pub(crate) fn generate_preamble(
     location_full_name: &str,
     current_date: &chrono::DateTime<chrono_tz::Tz>,
     current_weather: journey2::core::weather::Weather,
-) -> Result<String, Box<dyn std::error::Error>> {
-    let weather_map = utils::enums::get_weather_map();
-
-    Ok(format!(
+) -> String {
+    format!(
         "DATE: {}\n\
         LOCATION: {}\n\
         \n\
@@ -48,5 +46,5 @@ pub(crate) fn generate_preamble(
         current_weather.pressure,
         current_weather.humidity,
         current_weather.visibility / 1000.0
-    ))
+    )
 }
