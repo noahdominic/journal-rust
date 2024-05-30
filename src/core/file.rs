@@ -5,8 +5,15 @@ use directories;
 use serde::Deserialize;
 use toml;
 
-/// Represents errors that can occur during file operations in the application.
-///
+////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Data structures required for core file functionalities
+//
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/// enum FileError
+/// Represents errors that can occur during file operations in the application
+////////////////////////////////////////////////////////////////////////////////////////////////////
 #[derive(Debug)]
 pub(crate) enum FileError {
     FailedToCreateConfigDir,
@@ -38,8 +45,9 @@ impl std::fmt::Display for FileError {
     }
 }
 
+/// enum ConfigError
 /// Wrapper for all the errors that can occur during contact with the config file
-///
+////////////////////////////////////////////////////////////////////////////////////////////////////
 #[derive(Debug)]
 pub enum ConfigError {
     File(FileError),
@@ -82,9 +90,11 @@ impl std::error::Error for ConfigError {
     }
 }
 
-// Expected structure for config file
-// P.S.  I wish Rust had inline nested struct declarations
-// P.P.S I wish the `serde` package had automatic type deserialisers
+/// struct ConfDefaults
+/// Expected structure for config file
+//   P.S.  I wish Rust had inline nested struct declarations
+//   P.P.S I wish the `serde` package had automatic type deserialisers
+////////////////////////////////////////////////////////////////////////////////////////////////////
 #[derive(Debug, Deserialize)]
 pub(crate) struct ConfDefaults {
     pub(crate) location_full_name: String,
@@ -104,11 +114,16 @@ where
     s.parse::<f64>().map_err(serde::de::Error::custom)
 }
 
+/// struct ConfData
+/// Expected structure for the config file
+////////////////////////////////////////////////////////////////////////////////////////////////////
 #[derive(Debug, Deserialize)]
 pub(crate) struct ConfData {
     pub(crate) defaults: ConfDefaults,
 }
 
+// Functions that get dir/file paths for the journal project
+////////////////////////////////////////////////////////////////////////////////////////////////////
 fn get_config_file_path() -> Result<std::path::PathBuf, FileError> {
     if let Some(proj_dirs) = directories::ProjectDirs::from("", "", env!("CARGO_PKG_NAME")) {
         let config_dir_path = proj_dirs.config_dir();
@@ -126,6 +141,8 @@ pub(crate) fn is_config_file_exists() -> Result<bool, FileError> {
     Ok(get_config_file_path()?.exists())
 }
 
+// File content readers and writers
+////////////////////////////////////////////////////////////////////////////////////////////////////
 pub(crate) fn write_contents_to_config_file(config_contents: String) -> Result<(), FileError> {
     let config_file_path = get_config_file_path()?;
 
