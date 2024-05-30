@@ -15,20 +15,10 @@ pub(crate) fn is_journal_initialised_frontend() -> Result<bool, journey2::core::
 
 pub(crate) fn generate_preamble(
     location_full_name: &str,
-    location_latitude: f64,
-    location_longitude: f64,
-    timezone: &str,
+    current_date: &chrono::DateTime<chrono_tz::Tz>,
+    current_weather: journey2::core::weather::Weather,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let weather_map = utils::enums::get_weather_map();
-
-    let current_date = journey2::core::chrono::get_current_date_from_tz_as_str(&timezone)?;
-
-    let current_weather = journey2::core::weather::query::get_current_weather_at_location_and_time(
-        &current_date.to_string(),
-        &location_latitude.to_string(),
-        &location_longitude.to_string(),
-        &timezone,
-    )?;
 
     Ok(format!(
         "DATE: {}\n\
