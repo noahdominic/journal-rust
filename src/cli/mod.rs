@@ -91,5 +91,44 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
 
     print!("{}", preamble_str);
 
+    println!("{:?}", journey2::core::file::get_temp_file_path()?);
+
+    // Write temporary file to data directory
+    let mut temporary_file = std::fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .open(journey2::core::file::get_temp_file_path()?)?;
+
+    std::io::Write::write_all(&mut temporary_file, preamble_str.as_bytes())?;
+
+    // Invoke the editor as a subprocess
+    let editor_proc = std::process::Command::new(&config_data.editor)
+        .arg(&journey2::core::file::get_temp_file_path()?)
+        .stdin(std::process::Stdio::inherit())
+        .stdout(std::process::Stdio::inherit())
+        .stderr(std::process::Stdio::inherit())
+        .status()
+        .expect(&format!("Failed to start {}", &config_data.editor));
+
+    if !editor_proc.success() {
+        println!("Vim was not successful");
+        return Ok(());
+    }
+
+    // Read the modified content from the temporary file
+    let mut modified_content = String::new();
+    std::fs::File::open(&journey2::core::file::get_temp_file_path()?)
+        .expect("Failed to open temporary file")
+        .read_to_string(&mut modified_content)
+        .expect("Failed to read temporary file");
+
+    // Check if there were any changes
+    if modified_content == preamble_str {
+        println!("No changes found.  Will not be writing into a new entry.");
+        return Ok(());
+    } else {
+        println!("Ok ra man");
+    }
+
     Ok(())
 }
