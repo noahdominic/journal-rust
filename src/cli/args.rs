@@ -13,7 +13,7 @@ pub struct JournalArgs {
 
 #[derive(Debug, Subcommand)]
 pub enum JournalCommand {
-    /// Initialise the your journal
+    /// Initialise your journal
     Init,
 
     /// Creates a new journal entry for today
