@@ -60,7 +60,7 @@ fn handle_init() -> Result<(), Box<dyn std::error::Error>> {
         config_contents
     );
 
-    if journey2::core::file::is_config_file_exists()? {
+    if journey2::core::file::is_journal_initialised()? {
         if !interaction::ask::ask_if_to_overwrite_config()? {
             // Was cancelled
             return Ok(());
