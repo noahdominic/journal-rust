@@ -156,7 +156,7 @@ pub(crate) fn get_temp_file_path() -> Result<std::path::PathBuf, FileError> {
 
 // If X exists checkers
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-pub(crate) fn is_config_file_exists() -> Result<bool, FileError> {
+pub(crate) fn is_journal_initialised() -> Result<bool, FileError> {
     Ok(get_config_file_path()?.exists())
 }
 
