@@ -8,7 +8,7 @@ mod utils {
     pub(crate) mod functions;
 }
 
-use std::io::Read;
+use std::io::{Read, Write};
 
 use crate as journey2;
 
@@ -132,5 +132,25 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
         println!("Ok ra man");
     }
 
+    let todays_entry_path = journey2::core::file::get_path_for_todays_entry()?;
+
+    let todays_entry_parent_path = std::path::Path::new(&todays_entry_path)
+        .parent()
+        .expect("Error in extracting parent of today's entry")
+        .to_str()
+        .expect("Error in converting `Path` to `&str`");
+
+    std::fs::create_dir_all(todays_entry_parent_path)?;
+
+    let mut todays_entry_file = std::fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .open(&todays_entry_path)?;
+
+    todays_entry_file.write_all(modified_content.as_bytes())?;
+
+    // Clean up the temporary file
+    std::fs::remove_file(journey2::core::file::get_temp_file_path()?)
+        .expect("Failed to remove temporary file");
     Ok(())
 }
