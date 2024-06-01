@@ -29,5 +29,5 @@ pub enum JournalCommand {
 pub struct OpenArgs {
     /// The date of the entry you want to open in 'YYYY-MM-DD' format
     #[arg(short, long)]
-    date: Option<String>,
+    pub date: Option<String>,
 }

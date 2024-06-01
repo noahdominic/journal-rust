@@ -156,12 +156,26 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-fn handle_open(date: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
+fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
     if !utils::functions::is_journal_initialised_frontend()? {
         return Ok(()); // Early return if journal not initialised
     }
 
-    println!("{:?}", date);
+    let date = args.date.unwrap_or(
+        journey2::core::chrono::get_current_date_from_tz_as_str(
+            &journey2::core::file::get_config_from_config_file()?
+                .defaults
+                .timezone
+            )?
+                .to_string()
+                .split(' ')
+                .collect::<Vec<_>>()[0]
+                .to_owned()
+    );
+
+    let path_pattern = date.split('-').collect::<Vec<_>>().join("/");
+
+    println!("{:?} {:?}", date, path_pattern);
 
     Ok(())
 }
