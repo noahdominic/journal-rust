@@ -11,6 +11,7 @@ mod utils {
 use std::io::{Read, Write};
 
 use crate as journey2;
+use crate::cli::args::OpenArgs;
 
 /** Calls the appropriate function for each subcommand (`init`, `new`, `open`)
  */
@@ -20,7 +21,7 @@ pub fn handle_main() -> Result<(), Box<dyn std::error::Error>> {
         match command {
             args::JournalCommand::Init => handle_init()?,
             args::JournalCommand::New => handle_new()?,
-            args::JournalCommand::Open => (),
+            args::JournalCommand::Open(open_args) => handle_open(open_args)?,
         }
     }
     Ok(())
@@ -152,5 +153,15 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
     // Clean up the temporary file
     std::fs::remove_file(journey2::core::file::get_temp_file_path()?)
         .expect("Failed to remove temporary file");
+    Ok(())
+}
+
+fn handle_open(date: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
+    if !utils::functions::is_journal_initialised_frontend()? {
+        return Ok(()); // Early return if journal not initialised
+    }
+
+    println!("{:?}", date);
+
     Ok(())
 }

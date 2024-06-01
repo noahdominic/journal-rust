@@ -1,7 +1,7 @@
 // Copyright 2023, 2024  Noah Dominic Miranda Silvio.  All rights reserved.
 // Licensed under the EUPL v1.2
 
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, Args};
 
 #[derive(Debug, Parser)]
 #[command(arg_required_else_help = true)]
@@ -20,7 +20,14 @@ pub enum JournalCommand {
     New,
 
     /// Open today's entry
-    Open,
+    Open(OpenArgs),
     // /// Prints a file to stdout. Default to today's entry.
     // Show,
+}
+
+#[derive(Debug, Args)]
+pub struct OpenArgs {
+    /// The date of the entry you want to open in 'YYYY-MM-DD' format
+    #[arg(short, long)]
+    date: Option<String>,
 }
