@@ -4,6 +4,7 @@
 use directories;
 use serde::Deserialize;
 use toml;
+use crate::core::chrono::get_current_date_from_tz_as_str;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -122,7 +123,7 @@ pub(crate) struct ConfData {
     pub(crate) defaults: ConfDefaults,
 }
 
-// Functions that get dir/file paths for the journal project
+// Functions that get and generate dir/file paths for the journal project
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 fn get_config_file_path() -> Result<std::path::PathBuf, FileError> {
     if let Some(proj_dirs) = directories::ProjectDirs::from("", "", env!("CARGO_PKG_NAME")) {
@@ -152,6 +153,25 @@ pub fn get_data_dir_path() -> Result<std::path::PathBuf, FileError> {
 
 pub(crate) fn get_temp_file_path() -> Result<std::path::PathBuf, FileError> {
     Ok(get_data_dir_path()?.join(".temp_entry"))
+}
+
+pub(crate) fn get_path_for_todays_entry() -> Result<String, Box<dyn std::error::Error>>{
+    let extension = "txt";
+
+    let data_dir = get_data_dir_path()?;
+
+    let conf_data = get_config_from_config_file()?.defaults;
+
+    let current_date = get_current_date_from_tz_as_str(&conf_data.timezone)?;
+
+    let todays_entry_path = format!(
+        "{}/{}.{}",
+        data_dir.to_string_lossy(),
+        current_date.format("%Y/%m/%d.%H-%M"),
+        extension
+    );
+
+    Ok(todays_entry_path)
 }
 
 // If X exists checkers
