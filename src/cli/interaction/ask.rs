@@ -1,15 +1,19 @@
 // ask_user_for_location
 
-pub(in crate::cli) fn ask_user_for_location(
-) -> Result<(String, crate::core::Location), crate::cli::interaction::InteractionError> {
+use crate as journey2;
+
+pub(crate) fn ask_user_for_location(
+) -> Result<(String, journey2::core::Location), journey2::cli::interaction::InteractionError> {
     let full_address: String = super::q_basic::prompt_user_for_string(
         "What is your usual location?",
         "[optional address specifiers], <location>",
     )?;
 
-    let city = crate::core::str_man::sanitise_spaces_html(crate::core::str_man::split_location(&full_address));
+    let city = journey2::core::str_man::sanitise_spaces_html(
+        journey2::core::str_man::split_location(&full_address),
+    );
 
-    let api_response_native = crate::core::geo::get_location_info(&city)?;
+    let api_response_native = journey2::core::geo::get_location_info(&city)?;
 
     let city_info = super::q_basic::prompt_user_for_choice(
         "There are no locations in the database with that name.",
@@ -25,7 +29,7 @@ pub(in crate::cli) fn ask_user_for_location(
     Ok((full_address, city_info.clone()))
 }
 
-pub(in crate::cli) fn ask_for_editor() -> Result<String, crate::cli::interaction::InteractionError> {
+pub(crate) fn ask_for_editor() -> Result<String, journey2::cli::interaction::InteractionError> {
     let choice = super::q_basic::prompt_user_for_usize(
         r#"Which text editor would you like to use?  (You have to install this separately.)
     1. Vim
@@ -43,10 +47,12 @@ pub(in crate::cli) fn ask_for_editor() -> Result<String, crate::cli::interaction
         5 => ask_for_custom_editor_input()?,
         _ => {
             // Early return here.
-            return Err(crate::cli::interaction::InteractionError::from(std::io::Error::new(
-                std::io::ErrorKind::Unsupported,
-                "Uh oh!  Something happened that shouldn't have happened.",
-            )));
+            return Err(journey2::cli::interaction::InteractionError::from(
+                std::io::Error::new(
+                    std::io::ErrorKind::Unsupported,
+                    "Uh oh!  Something happened that shouldn't have happened.",
+                ),
+            ));
         }
     };
 
@@ -62,10 +68,11 @@ fn ask_for_custom_editor_input() -> std::io::Result<String> {
     Ok(command)
 }
 
-pub(in crate::cli) fn ask_if_to_overwrite_config() -> std::io::Result<bool> {
+pub(crate) fn ask_if_to_overwrite_config() -> std::io::Result<bool> {
     if !super::q_basic::prompt_user_for_bool(
         "It seems like Journey already been initialised. \
-        Would you like to overwrite the current existing config file with your new details?")?{
+        Would you like to overwrite the current existing config file with your new details?",
+    )? {
         println!("Config initialisation cancelled.");
 
         return Ok(false);
