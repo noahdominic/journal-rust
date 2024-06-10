@@ -80,7 +80,8 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
 
     let config_data = journey2::core::file::get_config_from_config_file()?.defaults;
 
-    let current_date = journey2::core::chrono::get_current_date_from_tz_as_str(&config_data.timezone)?;
+    let current_date =
+        journey2::core::chrono::get_current_date_from_tz_as_str(&config_data.timezone)?;
 
     let current_weather = journey2::core::weather::query::get_current_weather_at_location_and_time(
         &current_date.to_string(),
@@ -89,8 +90,11 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
         &config_data.timezone,
     )?;
 
-
-    let preamble_str = utils::functions::generate_preamble(&config_data.location_full_name, &current_date, current_weather);
+    let preamble_str = utils::functions::generate_preamble(
+        &config_data.location_full_name,
+        &current_date,
+        current_weather,
+    );
 
     print!("{}", preamble_str);
 
@@ -161,21 +165,40 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
         return Ok(()); // Early return if journal not initialised
     }
 
+    let data_path = journey2::core::file::get_data_dir_path()?;
+
     let date = args.date.unwrap_or(
         journey2::core::chrono::get_current_date_from_tz_as_str(
             &journey2::core::file::get_config_from_config_file()?
                 .defaults
-                .timezone
-            )?
-                .to_string()
-                .split(' ')
-                .collect::<Vec<_>>()[0]
-                .to_owned()
+                .timezone,
+        )?
+        .to_string()
+        .split(' ')
+        .collect::<Vec<_>>()[0]
+            .to_owned(),
     );
 
-    let path_pattern = date.split('-').collect::<Vec<_>>().join("/");
+    let path_pattern = glob::Pattern::new(&format!(
+        "{}/{}*.txt",
+        data_path.to_string_lossy(),
+        date.split('-').collect::<Vec<_>>().join("/")
+    ))
+    .unwrap();
 
-    println!("{:?} {:?}", date, path_pattern);
+    println!("{:?} {:?}", date, path_pattern.as_str());
+
+    for entry in walkdir::WalkDir::new(journey2::core::file::get_data_dir_path()?)
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
+        let path = entry.path();
+        if path_pattern.matches_path(path) {
+            println!("{}", path.display());
+        }
+    }
+
+    println!("xzczxczxcxz");
 
     Ok(())
 }
