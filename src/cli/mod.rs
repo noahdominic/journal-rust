@@ -188,17 +188,22 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
 
     println!("{:?} {:?}", date, path_pattern.as_str());
 
+    let mut matching_files: Vec<std::path::PathBuf> = vec![];
+
     for entry in walkdir::WalkDir::new(journey2::core::file::get_data_dir_path()?)
         .into_iter()
         .filter_map(|e| e.ok())
     {
         let path = entry.path();
         if path_pattern.matches_path(path) {
+            matching_files.push(path.strip_prefix(data_path.as_path())?.to_path_buf());
             println!("{}", path.display());
         }
     }
 
     println!("xzczxczxcxz");
+
+    println!("{:?}", matching_files);
 
     Ok(())
 }
