@@ -48,3 +48,42 @@ pub(crate) fn generate_preamble(
         current_weather.visibility / 1000.0
     )
 }
+
+pub(crate) fn extract_naive_datetime(
+    filename: &std::path::PathBuf,
+) -> chrono::ParseResult<chrono::NaiveDateTime> {
+    // Ths file name we receive would probably have the format:
+    // `YYYY//MM//DD.HH-mm.txt`.
+    //
+    // Of course, as we allow other options for `open`, we MAY
+    // have to accept other file names that have different
+    // starting relative paths.
+    // Create a PathBuf (for example)
+
+    // Convert PathBuf to string with forward slashes
+    let path_string = filename
+        .with_extension("")
+        .to_str()
+        .unwrap()
+        .replace("\\", "/");
+
+    chrono::NaiveDateTime::parse_from_str(&path_string, "%Y/%m/%d.%H-%M")
+}
+
+fn get_month_name(month_num: &str) -> Result<&'static str, &'static str> {
+    match month_num {
+        "1" | "01" => Ok("January"),
+        "2" | "02" => Ok("February"),
+        "3" | "03" => Ok("March"),
+        "4" | "04" => Ok("April"),
+        "5" | "05" => Ok("May"),
+        "6" | "06" => Ok("June"),
+        "7" | "07" => Ok("July"),
+        "8" | "08" => Ok("August"),
+        "9" | "09" => Ok("September"),
+        "10" => Ok("October"),
+        "11" => Ok("November"),
+        "12" => Ok("December"),
+        _ => Err("Invalid month number"),
+    }
+}

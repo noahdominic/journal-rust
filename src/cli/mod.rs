@@ -196,7 +196,7 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
     {
         let path = entry.path();
         if path_pattern.matches_path(path) {
-            matching_files.push(path.strip_prefix(data_path.as_path())?.to_path_buf());
+            matching_files.push(path.strip_prefix(&data_path)?.to_path_buf());
             println!("{}", path.display());
         }
     }
@@ -204,6 +204,15 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
     println!("xzczxczxcxz");
 
     println!("{:?}", matching_files);
+
+    let n: Vec<chrono::ParseResult<chrono::NaiveDateTime>> = matching_files
+        .into_iter()
+        .map(|file| journey2::cli::utils::functions::extract_naive_datetime(&file))
+        .collect();
+
+    for x in n {
+        println!("{}", x?.format("%Y %B %d, %H:%M"));
+    }
 
     Ok(())
 }
