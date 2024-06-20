@@ -10,6 +10,7 @@ use crate::core;
 #[derive(Debug)]
 pub(in crate::cli) enum InteractionError {
     IoError(std::io::Error),
+    ChronoParseError(chrono::ParseError),
     ParseIntError(std::num::ParseIntError),
     JourneyCoreError(core::JourneyCoreError)
 }
@@ -18,6 +19,10 @@ impl From<std::io::Error> for InteractionError {
     fn from(error: std::io::Error) -> Self {
         InteractionError::IoError(error)
     }
+}
+
+impl From<chrono::ParseError> for InteractionError {
+    fn from(error: chrono::ParseError) -> Self { InteractionError::ChronoParseError(error) }
 }
 
 impl From<std::num::ParseIntError> for InteractionError {
@@ -36,6 +41,7 @@ impl std::fmt::Display for InteractionError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             InteractionError::IoError(ref err) => err.fmt(f),
+            InteractionError::ChronoParseError(ref err) => err.fmt(f),
             InteractionError::ParseIntError(ref err) => err.fmt(f),
             InteractionError::JourneyCoreError(ref err) => err.fmt(f),
         }
@@ -46,6 +52,7 @@ impl std::error::Error for InteractionError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
             InteractionError::ParseIntError(err) => Some(err),
+            InteractionError::ChronoParseError(err) => Some(err),
             InteractionError::IoError(err) => Some(err),
             InteractionError::JourneyCoreError(err) => Some(err),
         }
