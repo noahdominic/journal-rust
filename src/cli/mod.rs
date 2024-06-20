@@ -203,14 +203,14 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
 
     println!("{:?}", matching_files);
 
-    let n: Vec<chrono::ParseResult<chrono::NaiveDateTime>> = matching_files
+    let matching_dates: Vec<chrono::NaiveDateTime> = matching_files
         .into_iter()
-        .map(|file| journey2::cli::utils::functions::extract_naive_datetime(&file))
+        .map(|file| journey2::cli::utils::functions::extract_naive_datetime(&file).unwrap())
         .collect();
 
-    for x in n {
-        println!("{}", x?.format("%Y %B %d, %H:%M"));
-    }
+    let choice = journey2::cli::interaction::ask::ask_for_which_date(&matching_dates)?;
+
+    println!("{}", choice.format("%b %d, %Y - %H:%M"));
 
     Ok(())
 }
