@@ -2,6 +2,41 @@
 
 use crate as journey2;
 
+pub(crate) fn ask_for_which_date(matching_dates: &Vec<chrono::NaiveDateTime>)
+    -> Result<chrono::NaiveDateTime, journey2::cli::interaction::InteractionError>
+{
+    // This function's implementation is so jank.  Hopefully we can improve this someday.
+    // Why it's jank:
+    //    We accept a vector of `NaiveDateTime`s.  We convert those to `String`
+    //    with a given `format: &str`.  We give that vector of string slices
+    //    to `prompt_user_for_choice`, which returns a `&String`.  THEN we then use that result,
+    //    combined with the `format`, and create A NEW `NaiveDateTime`, which we return.
+    // Why we had to do this:
+    //    All because `NaiveDateTime`'s implementation of `Display` uses a user-unfriendly format.
+    //    As per `chrono` docs:
+    //        >> The `Display` output of the naive date and time dt is the same
+    //        >> as `dt.format("%Y-%m-%d %H:%M:%S%.f")`.
+    let format = "%d %B %Y, %H:%M";
+
+    let matching_dates_formatted: Vec<String> = matching_dates
+        .into_iter()
+        .map(|date| format!("{}", date.format(format)))
+        .collect();
+
+    let choice = journey2::cli::interaction::q_basic::prompt_user_for_choice(
+        "There are no entries matching that date.",
+        "There are multiple entries found.  Which one is correct?",
+        "Enter the number of index of the entry you want",
+        "That doesn't seem to be one of the chocies.",
+        "Too many failed attempts.",
+        &matching_dates_formatted
+    )?;
+
+    let choice_naive_datetime = chrono::NaiveDateTime::parse_from_str(choice, format)?;
+
+    Ok(choice_naive_datetime)
+}
+
 pub(crate) fn ask_user_for_location(
 ) -> Result<(String, journey2::core::Location), journey2::cli::interaction::InteractionError> {
     let full_address: String = super::q_basic::prompt_user_for_string(
