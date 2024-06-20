@@ -201,8 +201,6 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
         }
     }
 
-    println!("xzczxczxcxz");
-
     println!("{:?}", matching_files);
 
     let n: Vec<chrono::ParseResult<chrono::NaiveDateTime>> = matching_files
