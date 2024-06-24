@@ -1,4 +1,8 @@
-// ask_user_for_location
+/*******************************************************************************
+ * Copyright (c) 2023, 2024  Noah Dominic Miranda Silvio.  All rights reserved
+ * Licensed under the EUPL v1.2
+ ******************************************************************************/
+
 
 use crate as journey2;
 

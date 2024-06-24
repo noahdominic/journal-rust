@@ -1,3 +1,9 @@
+/*******************************************************************************
+ * Copyright (c) 2023, 2024  Noah Dominic Miranda Silvio.  All rights reserved
+ * Licensed under the EUPL v1.2
+ ******************************************************************************/
+
+
 use crate as journey2;
 
 pub(crate) fn get_current_weather_at_location_and_time(

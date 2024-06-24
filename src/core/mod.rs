@@ -1,5 +1,8 @@
-// Copyright 2023, 2024  Noah Dominic Miranda Silvio
-// Licensed under the EUPL v1.2
+/*******************************************************************************
+ * Copyright (c) 2023, 2024  Noah Dominic Miranda Silvio.  All rights reserved
+ * Licensed under the EUPL v1.2
+ ******************************************************************************/
+
 
 //! Contains the core functionality required for maintaining Journey.
 //!
