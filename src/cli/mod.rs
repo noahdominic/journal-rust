@@ -189,7 +189,7 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
     ))
     .unwrap();
 
-    // Accumulate all matching files from the given glob pattern generated from 
+    // Accumulate all matching files from the given glob pattern generated from
     // the current date.
     let mut matching_files: Vec<std::path::PathBuf> = vec![];
 
@@ -203,17 +203,18 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
             println!("{}", path.display());
         }
     }
-    
+
     println!("{:?}", matching_files);
 
     // To display the dates encoded in the files' paths in a human-readable form,
     // the absolute paths must be converted into relative paths and then parsed.
     let relative_paths: Vec<std::path::PathBuf> = matching_files
         .into_iter()
-        .filter_map(|path| path.strip_prefix(&data_path)
-                    .ok()
-                    .map(std::path::Path::to_path_buf)
-                   )
+        .filter_map(|path| {
+            path.strip_prefix(&data_path)
+                .ok()
+                .map(std::path::Path::to_path_buf)
+        })
         .collect();
 
     let matching_dates: Vec<chrono::NaiveDateTime> = relative_paths
