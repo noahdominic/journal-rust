@@ -224,7 +224,7 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
 
     let choice = journey2::cli::interaction::ask::ask_for_which_date(&matching_dates)?;
 
-    println!("{}", choice.format("%b %d, %Y - %H:%M"));
+    println!("{}", matching_dates[choice].format("%b %d, %Y - %H:%M"));
 
     Ok(())
 }

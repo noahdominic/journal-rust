@@ -2,9 +2,9 @@
 
 use crate as journey2;
 
-pub(crate) fn ask_for_which_date(matching_dates: &Vec<chrono::NaiveDateTime>)
-    -> Result<chrono::NaiveDateTime, journey2::cli::interaction::InteractionError>
-{
+pub(crate) fn ask_for_which_date(
+    matching_dates: &Vec<chrono::NaiveDateTime>,
+) -> Result<usize, journey2::cli::interaction::InteractionError> {
     // This function's implementation is so jank.  Hopefully we can improve this someday.
     // Why it's jank:
     //    We accept a vector of `NaiveDateTime`s.  We convert those to `String`
@@ -23,18 +23,16 @@ pub(crate) fn ask_for_which_date(matching_dates: &Vec<chrono::NaiveDateTime>)
         .map(|date| format!("{}", date.format(format)))
         .collect();
 
-    let choice = journey2::cli::interaction::q_basic::prompt_user_for_choice(
+    let choice = journey2::cli::interaction::q_basic::prompt_user_for_choice_index(
         "There are no entries matching that date.",
         "There are multiple entries found.  Which one is correct?",
         "Enter the number of index of the entry you want",
         "That doesn't seem to be one of the chocies.",
         "Too many failed attempts.",
-        &matching_dates_formatted
+        &matching_dates_formatted,
     )?;
 
-    let choice_naive_datetime = chrono::NaiveDateTime::parse_from_str(choice, format)?;
-
-    Ok(choice_naive_datetime)
+    Ok(choice)
 }
 
 pub(crate) fn ask_user_for_location(
