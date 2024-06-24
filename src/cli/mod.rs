@@ -161,12 +161,15 @@ fn handle_new() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
+    // Early return if journal is not initialised
     if !utils::functions::is_journal_initialised_frontend()? {
         return Ok(()); // Early return if journal not initialised
     }
 
+    // Get all the needed data about the journal
     let data_path = journey2::core::file::get_data_dir_path()?;
 
+    // Get the current date via time zone indicated in config file
     let date = args.date.unwrap_or(
         journey2::core::chrono::get_current_date_from_tz_as_str(
             &journey2::core::file::get_config_from_config_file()?
@@ -186,8 +189,8 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
     ))
     .unwrap();
 
-    println!("{:?} {:?}", date, path_pattern.as_str());
-
+    // Accumulate all matching files from the given glob pattern generated from 
+    // the current date.
     let mut matching_files: Vec<std::path::PathBuf> = vec![];
 
     for entry in walkdir::WalkDir::new(journey2::core::file::get_data_dir_path()?)
@@ -203,6 +206,8 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
     
     println!("{:?}", matching_files);
 
+    // To display the dates encoded in the files' paths in a human-readable form,
+    // the absolute paths must be converted into relative paths and then parsed.
     let relative_paths: Vec<std::path::PathBuf> = matching_files
         .into_iter()
         .filter_map(|path| path.strip_prefix(&data_path)
