@@ -196,14 +196,22 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
     {
         let path = entry.path();
         if path_pattern.matches_path(path) {
-            matching_files.push(path.strip_prefix(&data_path)?.to_path_buf());
+            matching_files.push(path.to_path_buf());
             println!("{}", path.display());
         }
     }
-
+    
     println!("{:?}", matching_files);
 
-    let matching_dates: Vec<chrono::NaiveDateTime> = matching_files
+    let relative_paths: Vec<std::path::PathBuf> = matching_files
+        .into_iter()
+        .filter_map(|path| path.strip_prefix(&data_path)
+                    .ok()
+                    .map(std::path::Path::to_path_buf)
+                   )
+        .collect();
+
+    let matching_dates: Vec<chrono::NaiveDateTime> = relative_paths
         .into_iter()
         .map(|file| journey2::cli::utils::functions::extract_naive_datetime(&file).unwrap())
         .collect();
