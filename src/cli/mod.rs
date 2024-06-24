@@ -208,18 +208,11 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
 
     // To display the dates encoded in the files' paths in a human-readable form,
     // the absolute paths must be converted into relative paths and then parsed.
-    let relative_paths: Vec<std::path::PathBuf> = matching_files
+    let matching_dates: Vec<chrono::NaiveDateTime> = matching_files 
         .into_iter()
-        .filter_map(|path| {
-            path.strip_prefix(&data_path)
-                .ok()
-                .map(std::path::Path::to_path_buf)
-        })
-        .collect();
-
-    let matching_dates: Vec<chrono::NaiveDateTime> = relative_paths
-        .into_iter()
-        .map(|file| journey2::cli::utils::functions::extract_naive_datetime(&file).unwrap())
+        .filter_map(|file| journey2::cli::utils::functions::extract_naive_datetime(
+                &(file.strip_prefix(&data_path).unwrap())
+                ).ok())
         .collect();
 
     let choice = journey2::cli::interaction::ask::ask_for_which_date(&matching_dates)?;
