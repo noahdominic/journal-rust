@@ -208,7 +208,7 @@ fn handle_open(args: OpenArgs) -> Result<(), Box<dyn std::error::Error>> {
 
     // To display the dates encoded in the files' paths in a human-readable form,
     // the absolute paths must be converted into relative paths and then parsed.
-    let matching_dates: Vec<chrono::NaiveDateTime> = matching_files 
+    let matching_dates: Vec<chrono::NaiveDateTime> = matching_files
         .into_iter()
         .filter_map(|file| journey2::cli::utils::functions::extract_naive_datetime(
                 &(file.strip_prefix(&data_path).unwrap())
