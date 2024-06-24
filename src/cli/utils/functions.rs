@@ -50,7 +50,7 @@ pub(crate) fn generate_preamble(
 }
 
 pub(crate) fn extract_naive_datetime(
-    filename: &std::path::PathBuf,
+    filename: &std::path::Path,
 ) -> chrono::ParseResult<chrono::NaiveDateTime> {
     // Ths file name we receive would probably have the format:
     // `YYYY//MM//DD.HH-mm.txt`.
